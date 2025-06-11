@@ -232,16 +232,27 @@
             </button>
             <p class="text-gray-500 text-sm mt-2">
                 ※撮影した画像はアプリ内に一時的に表示されます。<br>
-                　スマホ本体への直接保存や送信はできません。<br>
-                　必要な場合は「画像をダウンロード」し、手動で移動してください。
+                　スマホ本体への直接保存はできません。<br>
+                　**「シェア」ボタンでは、計算結果のテキストと撮影した画像をまとめて共有できます。**
             </p>
             <div id="imagePreviewContainer" class="mt-4 hidden">
                 <p class="text-gray-700 text-sm font-semibold mb-2">撮影画像プレビュー:</p>
                 <img id="imagePreview" class="max-w-full h-auto rounded-lg shadow-md mx-auto" alt="撮影画像プレビュー">
-                <button id="downloadImageButton"
-                        class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 text-sm">
-                    画像をダウンロード
-                </button>
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button id="downloadImageButton"
+                            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 text-sm">
+                        画像をダウンロード
+                    </button>
+                    <button id="shareImageOnlyButton"
+                            class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-sm">
+                        画像をシェア
+                    </button>
+                </div>
+                <p class="text-gray-500 text-sm mt-2">
+                    ※「画像をダウンロード」でスマホ本体のダウンロードフォルダに保存し、<br>
+                    　そこから手動で写真アプリ等に移動してください。<br>
+                    　「画像をシェア」は、撮影した画像のみを共有シートに渡します。
+                </p>
             </div>
         </div>
 
@@ -267,6 +278,7 @@
         const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
         const imagePreview = document.getElementById('imagePreview'); 
         const downloadImageButton = document.getElementById('downloadImageButton'); 
+        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton'); // 追加
 
 
         const resultCategoryDiv = document.getElementById('resultCategory');
@@ -453,7 +465,7 @@
             return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
         }
 
-        // シェアボタンのイベントリスナー
+        // メインのシェアボタンのイベントリスナー
         shareButton.addEventListener('click', async () => { 
             if (navigator.share) {
                 const shareData = {
@@ -464,7 +476,6 @@
 
                 // 撮影した画像があればfilesに含める
                 if (cameraInput.files && cameraInput.files.length > 0) {
-                    // Blob形式のファイルが必要
                     const imageFile = cameraInput.files[0];
                     shareData.files = [imageFile];
                 }
@@ -474,7 +485,6 @@
                     console.log('コンテンツが正常に共有されました');
                 } catch (error) {
                     console.error('コンテンツの共有中にエラーが発生しました:', error);
-                    // ユーザーが共有をキャンセルした場合もエラーになるため、エラーメッセージは出さない
                 }
             } else {
                 errorMessageDiv.textContent = 'お使いのブラウザはシェア機能に対応していません。'; 
@@ -545,6 +555,28 @@
                 setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
             }
         });
+
+        // 画像のみシェアボタンのイベントリスナー (新設)
+        shareImageOnlyButton.addEventListener('click', async () => {
+            if (navigator.share && cameraInput.files && cameraInput.files.length > 0) {
+                const imageFile = cameraInput.files[0];
+                try {
+                    await navigator.share({
+                        files: [imageFile],
+                        title: 'eBay利益計算アプリで撮影した画像', // 画像のみ共有時のタイトル
+                        text: '参考画像' // 画像のみ共有時のテキスト（オプション）
+                    });
+                    console.log('画像が正常に共有されました');
+                } catch (error) {
+                    console.error('画像の共有中にエラーが発生しました:', error);
+                }
+            } else {
+                errorMessageDiv.textContent = '共有する画像がありません。または、お使いのブラウザは画像シェア機能に対応していません。（HTTPS環境が必要です）';
+                errorMessageDiv.classList.remove('hidden');
+                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
+            }
+        });
+
 
         // 計算ボタンがクリックされた時の処理
         calculateButton.addEventListener('click', performCalculation);
