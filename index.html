@@ -261,12 +261,12 @@
         const calculateButton = document.getElementById('calculateButton');
         const fetchRateButton = document.getElementById('fetchRateButton');
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
-        const shareButton = document.getElementById('shareButton'); // 名称変更
+        const shareButton = document.getElementById('shareButton'); 
         const cameraInput = document.getElementById('cameraInput'); 
         const cameraButton = document.getElementById('cameraButton'); 
         const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
         const imagePreview = document.getElementById('imagePreview'); 
-        const downloadImageButton = document.getElementById('downloadImageButton'); // 追加
+        const downloadImageButton = document.getElementById('downloadImageButton'); 
 
 
         const resultCategoryDiv = document.getElementById('resultCategory');
@@ -454,15 +454,23 @@
         }
 
         // シェアボタンのイベントリスナー
-        shareButton.addEventListener('click', async () => { // ボタンIDをshareButtonに変更
+        shareButton.addEventListener('click', async () => { 
             if (navigator.share) {
-                const shareText = createShareMessage();
+                const shareData = {
+                    title: 'eBay利益計算結果',
+                    text: createShareMessage(),
+                    url: window.location.href 
+                };
+
+                // 撮影した画像があればfilesに含める
+                if (cameraInput.files && cameraInput.files.length > 0) {
+                    // Blob形式のファイルが必要
+                    const imageFile = cameraInput.files[0];
+                    shareData.files = [imageFile];
+                }
+
                 try {
-                    await navigator.share({
-                        title: 'eBay利益計算結果',
-                        text: shareText,
-                        url: window.location.href // 現在のアプリのURLも共有
-                    });
+                    await navigator.share(shareData);
                     console.log('コンテンツが正常に共有されました');
                 } catch (error) {
                     console.error('コンテンツの共有中にエラーが発生しました:', error);
@@ -500,7 +508,7 @@
 
         // カメラ起動ボタンのイベントリスナー
         cameraButton.addEventListener('click', () => {
-            cameraInput.click(); // 隠されたinput要素をクリックしてカメラを起動
+            cameraInput.click(); 
         });
 
         // カメラで撮影した画像が選択された時の処理
@@ -510,12 +518,12 @@
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     imagePreview.src = e.target.result;
-                    imagePreviewContainer.classList.remove('hidden'); // プレビューコンテナを表示
+                    imagePreviewContainer.classList.remove('hidden'); 
                 };
                 reader.readAsDataURL(file);
             } else {
                 imagePreview.src = '';
-                imagePreviewContainer.classList.add('hidden'); // プレビューコンテナを非表示
+                imagePreviewContainer.classList.add('hidden'); 
             }
         });
 
@@ -523,16 +531,14 @@
         downloadImageButton.addEventListener('click', () => {
             const imageUrl = imagePreview.src;
             if (imageUrl && imageUrl !== '') {
-                // ダウンロードリンクを作成
                 const a = document.createElement('a');
                 a.href = imageUrl;
-                // ファイル名を生成 (例: ebay_photo_YYYYMMDD_HHMMSS.png)
                 const now = new Date();
                 const filename = `ebay_photo_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.png`;
-                a.download = filename; // ダウンロード時のファイル名を指定
-                document.body.appendChild(a); // DOMに追加 (FireFoxなどで必要)
-                a.click(); // クリックをシミュレートしてダウンロードを開始
-                document.body.removeChild(a); // ダウンロード後、要素を削除
+                a.download = filename; 
+                document.body.appendChild(a); 
+                a.click(); 
+                document.body.removeChild(a); 
             } else {
                 errorMessageDiv.textContent = 'ダウンロードする画像がありません。';
                 errorMessageDiv.classList.remove('hidden');
