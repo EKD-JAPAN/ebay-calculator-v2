@@ -14,6 +14,10 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        /* カメラ入力要素を非表示にする */
+        #cameraInput {
+            display: none;
+        }
     </style>
 </head>
 
@@ -206,22 +210,28 @@
 
         <!-- シェアボタン -->
         <div class="mt-8 flex justify-center space-x-4">
-            <button id="shareButtonLine"
-                    class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
-                LINEでシェア
-            </button>
-            <button id="shareButtonEmail"
-                    class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                メールでシェア
-            </button>
             <button id="shareButtonSystem"
                     class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                システムシェア
+                シェア
             </button>
         </div>
 
-        <!-- 開発者情報 -->
-        <!-- 開発者情報のdivを削除しました -->
+        <!-- カメラ起動と画像メモ -->
+        <div class="mt-4 text-center">
+            <input type="file" accept="image/*" capture="camera" id="cameraInput">
+            <button id="cameraButton"
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                カメラ起動 (撮影メモ)
+            </button>
+            <p class="text-gray-500 text-sm mt-2">
+                ※撮影した画像の直接送信はできません。あくまで撮影メモとしてご利用ください。
+            </p>
+            <div id="imagePreviewContainer" class="mt-4 hidden">
+                <p class="text-gray-700 text-sm font-semibold mb-2">撮影画像プレビュー:</p>
+                <img id="imagePreview" class="max-w-full h-auto rounded-lg shadow-md mx-auto" alt="撮影画像プレビュー">
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -238,9 +248,12 @@
         const calculateButton = document.getElementById('calculateButton');
         const fetchRateButton = document.getElementById('fetchRateButton');
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
-        const shareButtonLine = document.getElementById('shareButtonLine');
-        const shareButtonEmail = document.getElementById('shareButtonEmail');
-        const shareButtonSystem = document.getElementById('shareButtonSystem'); // 追加
+        const shareButtonSystem = document.getElementById('shareButtonSystem'); 
+        const cameraInput = document.getElementById('cameraInput'); // 追加
+        const cameraButton = document.getElementById('cameraButton'); // 追加
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer'); // 追加
+        const imagePreview = document.getElementById('imagePreview'); // 追加
+
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
@@ -418,20 +431,7 @@
             return `【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
         }
 
-        // LINEでシェア
-        shareButtonLine.addEventListener('click', () => {
-            const message = createShareMessage();
-            const lineUrl = `https://line.me/R/msg/text/?${encodeURIComponent(message)}`;
-            window.open(lineUrl, '_blank');
-        });
-
-        // メールでシェア
-        shareButtonEmail.addEventListener('click', () => {
-            const subject = encodeURIComponent('eBay利益計算結果');
-            const body = encodeURIComponent(createShareMessage());
-            const mailtoUrl = `mailto:?subject=${subject}&body=${body}`;
-            window.open(mailtoUrl, '_blank');
-        });
+        // LINEやメールなど個別のシェアボタンは削除し、システムシェアに統一
 
         // システムシェアボタンのイベントリスナー
         shareButtonSystem.addEventListener('click', async () => {
@@ -441,7 +441,7 @@
                     await navigator.share({
                         title: 'eBay利益計算結果',
                         text: shareText,
-                        url: window.location.href // 現在のアプリのURLを共有
+                        url: window.location.href // 現在のアプリのURLも共有
                     });
                     console.log('コンテンツが正常に共有されました');
                 } catch (error) {
@@ -478,6 +478,26 @@
             }
         });
 
+        // カメラ起動ボタンのイベントリスナー
+        cameraButton.addEventListener('click', () => {
+            cameraInput.click(); // 隠されたinput要素をクリックしてカメラを起動
+        });
+
+        // カメラで撮影した画像が選択された時の処理
+        cameraInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden'); // プレビューコンテナを表示
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = '';
+                imagePreviewContainer.classList.add('hidden'); // プレビューコンテナを非表示
+            }
+        });
 
         // 計算ボタンがクリックされた時の処理
         calculateButton.addEventListener('click', performCalculation);
