@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,15 +10,17 @@
     <style>
         /* Google Fonts 'Inter' を読み込み */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
         body {
             font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
+
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-auto text-center">
-        <h1 class="text-3xl font-bold text-gray-800 mb-6 rounded-lg">
-            eBay利益計算アプリ
+        <h1 class="text-3xl font-bold text-gray-800 mb-6 rounded-lg text-center">
+            Zero One<br>eBay利益計算アプリ
         </h1>
 
         <!-- 商品カテゴリ -->
@@ -30,6 +33,7 @@
                     aria-label="商品カテゴリを選択">
                 <option value="none" selected disabled>選択してください</option>
                 <option value="SLR">SLR</option>
+                <option value="Rangefinder">Rangefinder</option>
                 <option value="point&shoot">Point&Shoot</option>
                 <option value="lens">Lens</option>
                 <option value="accessory">Accessory</option>
@@ -37,21 +41,41 @@
             </select>
         </div>
 
-        <!-- 商品名とeBay MINT値ボタン -->
+        <!-- 商品名 -->
         <div class="mb-5 text-left">
             <label for="productName" class="block text-gray-700 text-sm font-semibold mb-2">
                 商品名 (任意)
             </label>
+            <input type="text" id="productName" placeholder="例: Nikon F3 Body" value=""
+                   class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                   aria-label="商品名を入力">
+        </div>
+
+        <!-- コンディション入力欄とeBay参照ボタン -->
+        <div class="mb-5 text-left">
+            <label for="productCondition" class="block text-gray-700 text-sm font-semibold mb-2">
+                コンディション (任意)
+            </label>
             <div class="flex items-center space-x-2">
-                <input type="text" id="productName" placeholder="例: Nikon F3 Body" value=""
-                       class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                       aria-label="商品名を入力">
+                <select id="productCondition"
+                        class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                        aria-label="コンディションを選択">
+                    <option value="none" selected disabled>選択してください</option>
+                    <option value="TOP MINT">TOP MINT</option>
+                    <option value="MINT">MINT</option>
+                    <option value="NEAR MINT">NEAR MINT</option>
+                    <option value="EX 5">EX 5</option>
+                    <option value="EX 4">EX 4</option>
+                    <option value="AS IS">AS IS</option>
+                    <option value="FOR PARTS">FOR PARTS</option>
+                </select>
                 <button id="ebayReferenceButton"
                         class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 text-sm whitespace-nowrap">
                     eBay参照
                 </button>
             </div>
         </div>
+
 
         <!-- 出品価格 ($) -->
         <div class="mb-5 text-left">
@@ -143,6 +167,7 @@
                 <div class="text-lg font-bold text-gray-800 break-all min-h-[32px] flex flex-col items-start justify-center">
                     <span id="resultCategory">カテゴリ: ---</span>
                     <span id="resultName">商品名: ---</span>
+                    <span id="resultCondition">コンディション: ---</span>
                 </div>
             </div>
 
@@ -189,18 +214,21 @@
                     class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 メールでシェア
             </button>
+            <button id="shareButtonChatwork"
+                    class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2">
+                Chatworkでシェア
+            </button>
         </div>
 
         <!-- 開発者情報 -->
-        <div class="mt-12 text-center text-gray-500 text-sm">
-            <p>開発者: EKD</p>
-        </div>
+        <!-- 開発者情報のdivを削除しました -->
     </div>
 
     <script>
         // HTML要素への参照を取得
         const productCategorySelect = document.getElementById('productCategory');
         const productNameInput = document.getElementById('productName');
+        const productConditionSelect = document.getElementById('productCondition'); 
         const listingPriceUsdInput = document.getElementById('listingPriceUsd');
         const exchangeRateJpyUsdInput = document.getElementById('exchangeRateJpyUsd');
         const costPriceJpyInput = document.getElementById('costPriceJpy');
@@ -212,9 +240,11 @@
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButtonLine = document.getElementById('shareButtonLine');
         const shareButtonEmail = document.getElementById('shareButtonEmail');
+        const shareButtonChatwork = document.getElementById('shareButtonChatwork'); 
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
+        const resultConditionDiv = document.getElementById('resultCondition'); 
         const expectedProfitResultDiv = document.getElementById('expectedProfitResult');
         const profitMarginResultDiv = document.getElementById('profitMarginResult');
         const breakevenPointResultDiv = document.getElementById('breakevenPointResult');
@@ -231,6 +261,9 @@
             consumptionTaxRefundJpy: 0
         };
 
+        // 最後に参照したeBayリンクを保持する変数
+        let lastEbayReferenceUrl = '';
+
         // 計算を実行する関数
         function performCalculation() {
             // エラーメッセージと結果をリセット
@@ -241,19 +274,22 @@
             consumptionTaxRefundResultDiv.textContent = '--- 円';
             resultCategoryDiv.textContent = 'カテゴリ: ---';
             resultNameDiv.textContent = '商品名: ---';
+            resultConditionDiv.textContent = 'コンディション: ---'; 
 
             // 入力値を取得し、数値に変換
             const listingPriceUsd = parseFloat(listingPriceUsdInput.value);
             const exchangeRateJpyUsd = parseFloat(exchangeRateJpyUsdInput.value);
             const costPriceJpy = parseFloat(costPriceJpyInput.value);
             const commissionPercentage = parseFloat(commissionPercentageInput.value);
-            const shippingCostJpy = parseFloat(shippingCostJpyInput.value); // オプション項目なので値がなくてもOK
+            const shippingCostJpy = parseFloat(shippingCostJpyInput.value); 
 
             // 商品カテゴリと商品名を結果欄に表示
             const selectedCategory = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
             const inputProductName = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '未入力';
+            const selectedCondition = productConditionSelect.value !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '未選択'; 
             resultCategoryDiv.textContent = `カテゴリ: ${selectedCategory}`;
             resultNameDiv.textContent = `商品名: ${inputProductName}`;
+            resultConditionDiv.textContent = `コンディション: ${selectedCondition}`; 
 
             // 必須入力項目のバリデーションを強化
             let validationMessages = [];
@@ -329,8 +365,9 @@
             consumptionTaxRefundResultDiv.textContent = `${consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}`;
         }
 
-        // APIキー（このAPIは無料で利用可能ですが、有料プランなどで必要になる場合があります）
-        const apiKey = "1372dbb55066a8afb68619d3"; // Canvas環境では空文字列のままでOK
+        // 為替レートAPIキー
+        // v6.exchangerate-api.com を利用する場合、ここに取得したAPIキーを設定してください。（例: "YOUR_EXCHANGERATEAPI_KEY"）
+        const apiKey = "1372dbb55066a8afb68619d3"; 
 
         // 為替レートを取得する関数
         async function fetchExchangeRate() {
@@ -340,7 +377,6 @@
 
             try {
                 // ExchangeRate-APIのエンドポイントを使用
-                // 無料プランではAPIキーが不要な場合もありますが、本番環境では取得を推奨
                 const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`; // USDを基準に取得
                 const response = await fetch(apiUrl);
                 const data = await response.json();
@@ -367,19 +403,21 @@
         function createShareMessage() {
             const category = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
             const name = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '商品名なし';
+            const condition = productConditionSelect.value !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '未入力'; 
             const listingPrice = listingPriceUsdInput.value ? `$${parseFloat(listingPriceUsdInput.value).toFixed(2)}` : '未入力';
             const rate = exchangeRateJpyUsdInput.value ? parseFloat(exchangeRateJpyUsdInput.value).toFixed(2) : '未入力';
             const cost = costPriceJpyInput.value ? parseFloat(costPriceJpyInput.value).toLocaleString('ja-JP') : '未入力';
             const commission = commissionPercentageInput.value ? parseFloat(commissionPercentageInput.value).toFixed(1) : '未入力';
             const shipping = shippingCostJpyInput.value ? parseFloat(shippingCostJpyInput.value).toLocaleString('ja-JP') : '未入力';
             const memo = memoTextInput.value.trim() !== '' ? `\nメモ: ${memoTextInput.value.trim()}\n` : '';
+            const ebayLink = lastEbayReferenceUrl !== '' ? `\neBay参照リンク: ${lastEbayReferenceUrl}\n` : ''; 
 
             const profit = calculatedResults.expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
             const profitMargin = calculatedResults.profitMargin.toFixed(2);
             const breakeven = calculatedResults.breakevenPointUsd.toFixed(2);
             const refund = calculatedResults.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
 
-            return `【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}`;
+            return `【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
         }
 
         // LINEでシェア
@@ -397,17 +435,30 @@
             window.open(mailtoUrl, '_blank');
         });
 
+        // Chatworkでシェア
+        shareButtonChatwork.addEventListener('click', () => {
+            const message = createShareMessage();
+            const chatworkUrl = `https://www.chatwork.com/gateway.php?t=chatwork&m=${encodeURIComponent(message)}`;
+            window.open(chatworkUrl, '_blank');
+        });
+
         // eBay参照ボタンのイベントリスナー
         ebayReferenceButton.addEventListener('click', () => {
             const productName = productNameInput.value.trim();
-            if (productName !== '') {
-                // eBayの検索URLを構築
-                // _nkw: 検索キーワード (商品名)
-                // LH_Complete=1: 落札相場 (Completed listings)
-                // LH_Sold=1: 落札相場 (Sold listings)
-                // _sop=3: 並び順 (Price + Shipping: highest first)
-                const encodedProductName = encodeURIComponent(productName);
-                const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedProductName}&LH_Complete=1&LH_Sold=1&_sop=3`;
+            const productCondition = productConditionSelect.value; 
+            let searchQuery = productName;
+
+            // If a condition is selected (not 'none'), append it to the search query
+            if (productCondition !== 'none' && productCondition.trim() !== '') { 
+                searchQuery += ` ${productCondition}`; 
+            }
+
+            if (searchQuery.trim() !== '') {
+                const encodedSearchQuery = encodeURIComponent(searchQuery);
+                const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedSearchQuery}&LH_Complete=1&LH_Sold=1&_sop=3`;
+                
+                lastEbayReferenceUrl = ebaySearchUrl;
+
                 window.open(ebaySearchUrl, '_blank');
             } else {
                 errorMessageDiv.textContent = '商品名を入力してください。';
@@ -424,13 +475,10 @@
 
         // ページ読み込み時に一度レートを取得し、初期計算を実行
         document.addEventListener('DOMContentLoaded', () => {
-            fetchRateButton.click(); // レート自動取得をトリガー
-            // 初期値は設定しないので、必須入力項目が空の場合、最初の計算時にエラーが表示される
-            // costPriceJpyInput.value = 5000; // デフォルト値削除
-            // listingPriceUsdInput.value = ""; // 既に空
-            // shippingCostJpyInput.value = ""; // 既に空
-            performCalculation(); // 初期ロード時に一度計算を実行し、必須入力エラーを表示させる
+            fetchRateButton.click(); 
+            performCalculation(); 
         });
     </script>
 </body>
+
 </html>
