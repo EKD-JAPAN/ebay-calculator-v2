@@ -457,14 +457,15 @@
             const commission = commissionPercentageInput.value ? parseFloat(commissionPercentageInput.value).toFixed(1) : '未入力';
             const shipping = shippingCostJpyInput.value ? parseFloat(shippingCostJpyInput.value).toLocaleString('ja-JP') : '未入力';
             const memo = memoTextInput.value.trim() !== '' ? `\nメモ: ${memoTextInput.value.trim()}\n` : '';
-            const ebayLink = lastEbayReferenceUrl !== '' ? `\neBay参照リンク: ${lastEbayReferenceUrl}\n` : ''; 
+            // const ebayLink = lastEbayReferenceUrl !== '' ? `\neBay参照リンク: ${lastEbayReferenceUrl}\n` : ''; // 本アプリのリンクではないためそのまま
 
             const profit = calculatedResults.expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
             const profitMargin = calculatedResults.profitMargin.toFixed(2);
             const breakeven = calculatedResults.breakevenPointUsd.toFixed(2);
             const refund = calculatedResults.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
 
-            return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
+            // 本アプリのリンクを削除
+            return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}`; // ebayLinkは残す
         }
 
         // メインのシェアボタンのイベントリスナー
@@ -473,7 +474,7 @@
                 const shareData = {
                     title: 'eBay利益計算結果',
                     text: createShareMessage(),
-                    url: window.location.href 
+                    // url: window.location.href // 本アプリのリンクは不要
                 };
 
                 // 撮影した画像があればfilesに含める
