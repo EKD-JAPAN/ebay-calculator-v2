@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="ja">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,13 +9,11 @@
     <style>
         /* Google Fonts 'Inter' を読み込み */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         body {
             font-family: 'Inter', sans-serif;
         }
     </style>
 </head>
-
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
     <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-auto text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 rounded-lg">
@@ -59,7 +56,7 @@
         <!-- 出品価格 ($) -->
         <div class="mb-5 text-left">
             <label for="listingPriceUsd" class="block text-gray-700 text-sm font-semibold mb-2">
-                出品価格 ($)
+                出品価格 ($) <span class="text-red-500 font-bold">*</span>
             </label>
             <input type="number" id="listingPriceUsd" placeholder="例: 100.00" step="0.01" value=""
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -69,10 +66,10 @@
         <!-- 為替レート (円/ドル) -->
         <div class="mb-5 text-left">
             <label for="exchangeRateJpyUsd" class="block text-gray-700 text-sm font-semibold mb-2">
-                為替レート (円/ドル)
+                為替レート (円/ドル) <span class="text-red-500 font-bold">*</span>
             </label>
             <div class="flex items-center space-x-2">
-                <input type="number" id="exchangeRateJpyUsd" placeholder="例: 155.00" step="0.01"
+                <input type="number" id="exchangeRateJpyUsd" placeholder="例: 155.00" step="0.01" value=""
                        class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                        aria-label="為替レートを入力">
                 <button id="fetchRateButton"
@@ -91,9 +88,9 @@
         <!-- 仕入価格 (円) -->
         <div class="mb-5 text-left">
             <label for="costPriceJpy" class="block text-gray-700 text-sm font-semibold mb-2">
-                仕入価格 (円) <span class="font-normal text-gray-500">(税込額を入力)</span>
+                仕入価格 (円) <span class="text-red-500 font-bold">*</span> <span class="font-normal text-gray-500">(税込額を入力)</span>
             </label>
-            <input type="number" id="costPriceJpy" placeholder="例: 5000" step="1" value="0"
+            <input type="number" id="costPriceJpy" placeholder="例: 5000" step="1" value=""
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                    aria-label="仕入価格を日本円で入力">
         </div>
@@ -101,7 +98,7 @@
         <!-- 手数料 (%) -->
         <div class="mb-5 text-left">
             <label for="commissionPercentage" class="block text-gray-700 text-sm font-semibold mb-2">
-                手数料 (%)
+                手数料 (%) <span class="text-red-500 font-bold">*</span>
             </label>
             <input type="number" id="commissionPercentage" placeholder="例: 15" step="0.1" value="15"
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -117,7 +114,7 @@
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                    aria-label="送料を日本円で入力">
         </div>
-
+        
         <!-- メモ欄 -->
         <div class="mb-6 text-left">
             <label for="memoText" class="block text-gray-700 text-sm font-semibold mb-2">
@@ -143,8 +140,7 @@
             <!-- 商品カテゴリと商品名を結果欄に表示 -->
             <div id="productInfoResult" class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">商品情報</p>
-                <div
-                    class="text-lg font-bold text-gray-800 break-all min-h-[32px] flex flex-col items-start justify-center">
+                <div class="text-lg font-bold text-gray-800 break-all min-h-[32px] flex flex-col items-start justify-center">
                     <span id="resultCategory">カテゴリ: ---</span>
                     <span id="resultName">商品名: ---</span>
                 </div>
@@ -153,28 +149,28 @@
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">想定利益</p>
                 <div id="expectedProfitResult"
-                    class="text-3xl font-extrabold text-green-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-3xl font-extrabold text-green-600 break-all min-h-[48px] flex items-center justify-center">
                     --- 円
                 </div>
             </div>
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">利益率</p>
                 <div id="profitMarginResult"
-                    class="text-3xl font-extrabold text-blue-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-3xl font-extrabold text-blue-600 break-all min-h-[48px] flex items-center justify-center">
                     --- %
                 </div>
             </div>
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">損益分岐点</p>
                 <div id="breakevenPointResult"
-                    class="text-3xl font-extrabold text-red-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-3xl font-extrabold text-red-600 break-all min-h-[48px] flex items-center justify-center">
                     --- ドル
                 </div>
             </div>
             <div class="bg-gray-100 p-4 rounded-lg">
                 <p class="text-gray-600 text-sm font-semibold mb-1">消費税還付金</p>
                 <div id="consumptionTaxRefundResult"
-                    class="text-3xl font-extrabold text-purple-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-3xl font-extrabold text-purple-600 break-all min-h-[48px] flex items-center justify-center">
                     --- 円
                 </div>
             </div>
@@ -251,7 +247,7 @@
             const exchangeRateJpyUsd = parseFloat(exchangeRateJpyUsdInput.value);
             const costPriceJpy = parseFloat(costPriceJpyInput.value);
             const commissionPercentage = parseFloat(commissionPercentageInput.value);
-            const shippingCostJpy = parseFloat(shippingCostJpyInput.value);
+            const shippingCostJpy = parseFloat(shippingCostJpyInput.value); // オプション項目なので値がなくてもOK
 
             // 商品カテゴリと商品名を結果欄に表示
             const selectedCategory = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
@@ -259,13 +255,27 @@
             resultCategoryDiv.textContent = `カテゴリ: ${selectedCategory}`;
             resultNameDiv.textContent = `商品名: ${inputProductName}`;
 
-            // 入力値のバリデーション
-            if (isNaN(listingPriceUsd) || listingPriceUsd < 0 ||
-                isNaN(exchangeRateJpyUsd) || exchangeRateJpyUsd <= 0 ||
-                isNaN(costPriceJpy) || costPriceJpy < 0 ||
-                isNaN(commissionPercentage) || commissionPercentage < 0 || commissionPercentage > 100 ||
-                isNaN(shippingCostJpy) || shippingCostJpy < 0) {
-                errorMessageDiv.textContent = '有効な数値を入力してください。';
+            // 必須入力項目のバリデーションを強化
+            let validationMessages = [];
+
+            if (isNaN(listingPriceUsd) || listingPriceUsd < 0 || listingPriceUsdInput.value.trim() === '') {
+                validationMessages.push('「出品価格 ($)」に有効な数値を入力してください。');
+            }
+            if (isNaN(exchangeRateJpyUsd) || exchangeRateJpyUsd <= 0 || exchangeRateJpyUsdInput.value.trim() === '') {
+                validationMessages.push('「為替レート (円/ドル)」に有効な数値を入力してください。');
+            }
+            if (isNaN(costPriceJpy) || costPriceJpy < 0 || costPriceJpyInput.value.trim() === '') {
+                validationMessages.push('「仕入価格 (円)」に有効な数値を入力してください。');
+            }
+            if (isNaN(commissionPercentage) || commissionPercentage < 0 || commissionPercentage > 100 || commissionPercentageInput.value.trim() === '') {
+                validationMessages.push('「手数料 (%)」に有効な数値を入力してください。(0～100%)');
+            }
+            // 送料は必須ではないので、isNaN(shippingCostJpy) は value="" の場合は 0 として扱う
+            const finalShippingCostJpy = isNaN(shippingCostJpy) ? 0 : shippingCostJpy;
+
+
+            if (validationMessages.length > 0) {
+                errorMessageDiv.innerHTML = validationMessages.join('<br>');
                 errorMessageDiv.classList.remove('hidden');
                 return;
             }
@@ -286,7 +296,7 @@
             // 1. 想定利益 (JPY)
             // 想定利益 (円) = 売上 (円) - 手数料 (円) - 送料 (円) - 仕入価格 (円)
             // 注: 消費税還付金は別途表示し、想定利益には含めない
-            const expectedProfitJpy = revenueJpy - commissionJpy - shippingCostJpy - costPriceJpy;
+            const expectedProfitJpy = revenueJpy - commissionJpy - finalShippingCostJpy - costPriceJpy;
 
             // 2. 利益率 (%)
             // 利益率 (%) = (想定利益 (円) / 売上 (円)) × 100
@@ -301,7 +311,7 @@
             let breakevenPointUsd;
             const denominator = exchangeRateJpyUsd * (1 - commissionPercentage / 100);
             if (denominator > 0) {
-                breakevenPointUsd = (costPriceJpy + shippingCostJpy) / denominator;
+                breakevenPointUsd = (costPriceJpy + finalShippingCostJpy) / denominator;
             } else {
                 breakevenPointUsd = Infinity; // もしくは適切なエラー表示
             }
@@ -310,7 +320,7 @@
             calculatedResults.expectedProfitJpy = expectedProfitJpy;
             calculatedResults.profitMargin = profitMargin;
             calculatedResults.breakevenPointUsd = breakevenPointUsd;
-            calculatedResults.consumptionTaxRefundJpy = consumptionTaxRefundJpy; // 消費税還付金は計算はするが、想定利益には含めない
+            calculatedResults.consumptionTaxRefundJpy = consumptionTaxRefundJpy;
 
             // 結果を表示
             expectedProfitResultDiv.textContent = `${expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}`;
@@ -320,7 +330,7 @@
         }
 
         // APIキー（このAPIは無料で利用可能ですが、有料プランなどで必要になる場合があります）
-        const apiKey = ""; // Canvas環境では空文字列のままでOK
+        const apiKey = "1372dbb55066a8afb68619d3"; // Canvas環境では空文字列のままでOK
 
         // 為替レートを取得する関数
         async function fetchExchangeRate() {
@@ -415,12 +425,12 @@
         // ページ読み込み時に一度レートを取得し、初期計算を実行
         document.addEventListener('DOMContentLoaded', () => {
             fetchRateButton.click(); // レート自動取得をトリガー
-            // 初期値を設定して計算を実行 (ユーザーの入力しやすいように)
-            costPriceJpyInput.value = 5000; // 例: 5000円
-            // 出品価格と送料はデフォルトで入力なし
-            performCalculation();
+            // 初期値は設定しないので、必須入力項目が空の場合、最初の計算時にエラーが表示される
+            // costPriceJpyInput.value = 5000; // デフォルト値削除
+            // listingPriceUsdInput.value = ""; // 既に空
+            // shippingCostJpyInput.value = ""; // 既に空
+            performCalculation(); // 初期ロード時に一度計算を実行し、必須入力エラーを表示させる
         });
     </script>
 </body>
-
 </html>
