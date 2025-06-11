@@ -182,6 +182,7 @@
                 </div>
             </div>
 
+            <!-- 想定利益 -->
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">想定利益</p>
                 <div id="expectedProfitResult"
@@ -189,41 +190,39 @@
                     --- 円
                 </div>
             </div>
-            <div class="bg-gray-100 p-4 rounded-lg mb-3">
+
+            <!-- 利益率 -->
+            <div class="bg-gray-100 p-2 rounded-lg mb-3"> <!-- p-4からp-2に短縮 -->
                 <p class="text-gray-600 text-sm font-semibold mb-1">利益率</p>
                 <div id="profitMarginResult"
-                     class="text-3xl font-extrabold text-blue-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-xl font-extrabold text-blue-600 break-all min-h-[32px] flex items-center justify-center"> <!-- text-3xlからtext-xl、min-h-[48px]からmin-h-[32px]に短縮 -->
                     --- %
                 </div>
             </div>
-            <div class="bg-gray-100 p-4 rounded-lg mb-3">
+
+            <!-- 損益分岐点 -->
+            <div class="bg-gray-100 p-2 rounded-lg mb-3"> <!-- p-4からp-2に短縮 -->
                 <p class="text-gray-600 text-sm font-semibold mb-1">損益分岐点</p>
                 <div id="breakevenPointResult"
-                     class="text-3xl font-extrabold text-red-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-xl font-extrabold text-red-600 break-all min-h-[32px] flex items-center justify-center"> <!-- text-3xlからtext-xl、min-h-[48px]からmin-h-[32px]に短縮 -->
                     --- ドル
                 </div>
             </div>
-            <div class="bg-gray-100 p-4 rounded-lg">
+
+            <!-- 消費税還付金 -->
+            <div class="bg-gray-100 p-2 rounded-lg"> <!-- p-4からp-2に短縮 -->
                 <p class="text-gray-600 text-sm font-semibold mb-1">消費税還付金</p>
                 <div id="consumptionTaxRefundResult"
-                     class="text-3xl font-extrabold text-purple-600 break-all min-h-[48px] flex items-center justify-center">
+                     class="text-xl font-extrabold text-purple-600 break-all min-h-[32px] flex items-center justify-center"> <!-- text-3xlからtext-xl、min-h-[48px]からmin-h-[32px]に短縮 -->
                     --- 円
                 </div>
             </div>
             <p id="errorMessage" class="text-red-500 mt-4 text-sm hidden">
-                有効な数値を入力してください。
+                <!-- エラーメッセージはJavaScriptで動的に挿入されます -->
             </p>
         </div>
 
-        <!-- シェアボタン -->
-        <div class="mt-8 flex justify-center">
-            <button id="shareButton"
-                    class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                シェア
-            </button>
-        </div>
-
-        <!-- カメラ起動と画像メモ -->
+        <!-- カメラ起動と画像メモ (位置変更) -->
         <div class="mt-4 text-center">
             <input type="file" accept="image/*" capture="camera" id="cameraInput">
             <button id="cameraButton"
@@ -231,9 +230,7 @@
                 カメラ起動 (撮影メモ)
             </button>
             <p class="text-gray-500 text-sm mt-2">
-                ※撮影した画像はアプリ内に一時的に表示されます。<br>
-                　スマホ本体への直接保存はできません。<br>
-                　**「シェア」ボタンでは、計算結果のテキストと撮影した画像をまとめて共有できます。**
+                ※撮影した画像をシェアできます。スマホ本体への直接保存は出来ません。撮影後にシェアボタンを押してください。
             </p>
             <div id="imagePreviewContainer" class="mt-4 hidden">
                 <p class="text-gray-700 text-sm font-semibold mb-2">撮影画像プレビュー:</p>
@@ -248,12 +245,15 @@
                         画像をシェア
                     </button>
                 </div>
-                <p class="text-gray-500 text-sm mt-2">
-                    ※「画像をダウンロード」でスマホ本体のダウンロードフォルダに保存し、<br>
-                    　そこから手動で写真アプリ等に移動してください。<br>
-                    　「画像をシェア」は、撮影した画像のみを共有シートに渡します。
-                </p>
             </div>
+        </div>
+
+        <!-- シェアボタン (位置変更) -->
+        <div class="mt-8 flex justify-center">
+            <button id="shareButton"
+                    class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                シェア
+            </button>
         </div>
 
     </div>
@@ -278,7 +278,7 @@
         const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
         const imagePreview = document.getElementById('imagePreview'); 
         const downloadImageButton = document.getElementById('downloadImageButton'); 
-        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton'); // 追加
+        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton');
 
 
         const resultCategoryDiv = document.getElementById('resultCategory');
@@ -306,11 +306,13 @@
         // 計算を実行する関数
         function performCalculation() {
             // エラーメッセージと結果をリセット
-            errorMessageDiv.classList.add('hidden');
+            errorMessageDiv.classList.add('hidden'); // エラーメッセージを常に非表示から開始
             expectedProfitResultDiv.textContent = '--- 円';
             profitMarginResultDiv.textContent = '--- %';
             breakevenPointResultDiv.textContent = '--- ドル';
             consumptionTaxRefundResultDiv.textContent = '--- 円';
+            
+            // 計算前の商品情報表示は「---」にする
             resultCategoryDiv.textContent = 'カテゴリ: ---';
             resultNameDiv.textContent = '商品名: ---';
             resultConditionDiv.textContent = 'コンディション: ---'; 
@@ -321,14 +323,6 @@
             const costPriceJpy = parseFloat(costPriceJpyInput.value);
             const commissionPercentage = parseFloat(commissionPercentageInput.value);
             const shippingCostJpy = parseFloat(shippingCostJpyInput.value); 
-
-            // 商品カテゴリと商品名を結果欄に表示
-            const selectedCategory = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
-            const inputProductName = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '未入力';
-            const selectedCondition = productConditionSelect.value !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '未選択'; 
-            resultCategoryDiv.textContent = `カテゴリ: ${selectedCategory}`;
-            resultNameDiv.textContent = `商品名: ${inputProductName}`;
-            resultConditionDiv.textContent = `コンディション: ${selectedCondition}`; 
 
             // 必須入力項目のバリデーションを強化
             let validationMessages = [];
@@ -351,9 +345,17 @@
 
             if (validationMessages.length > 0) {
                 errorMessageDiv.innerHTML = validationMessages.join('<br>');
-                errorMessageDiv.classList.remove('hidden');
+                errorMessageDiv.classList.remove('hidden'); // エラーがある場合のみ表示
                 return;
             }
+
+            // 商品カテゴリと商品名を結果欄に表示 (バリデーション後に設定)
+            const selectedCategory = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
+            const inputProductName = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '未入力';
+            const selectedCondition = productConditionSelect.value !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '未選択'; 
+            resultCategoryDiv.textContent = `カテゴリ: ${selectedCategory}`;
+            resultNameDiv.textContent = `商品名: ${inputProductName}`;
+            resultConditionDiv.textContent = `コンディション: ${selectedCondition}`; 
 
             // 計算式の定義
 
@@ -496,12 +498,21 @@
         // eBay参照ボタンのイベントリスナー
         ebayReferenceButton.addEventListener('click', () => {
             const productName = productNameInput.value.trim();
-            const productCondition = productConditionSelect.value; 
-            let searchQuery = productName;
+            const productCondition = productConditionSelect.value;
+            const productCategory = productCategorySelect.value; // カテゴリを取得
 
-            if (productCondition !== 'none' && productCondition.trim() !== '') { 
-                searchQuery += ` ${productCondition}`; 
+            let searchQueryParts = [];
+            if (productCategory !== 'none' && productCategory.trim() !== '') {
+                searchQueryParts.push(productCategory);
             }
+            if (productName !== '') {
+                searchQueryParts.push(productName);
+            }
+            if (productCondition !== 'none' && productCondition.trim() !== '') {
+                searchQueryParts.push(productCondition);
+            }
+
+            const searchQuery = searchQueryParts.join(' '); // スペースで結合
 
             if (searchQuery.trim() !== '') {
                 const encodedSearchQuery = encodeURIComponent(searchQuery);
@@ -556,15 +567,15 @@
             }
         });
 
-        // 画像のみシェアボタンのイベントリスナー (新設)
+        // 画像のみシェアボタンのイベントリスナー
         shareImageOnlyButton.addEventListener('click', async () => {
             if (navigator.share && cameraInput.files && cameraInput.files.length > 0) {
                 const imageFile = cameraInput.files[0];
                 try {
                     await navigator.share({
                         files: [imageFile],
-                        title: 'eBay利益計算アプリで撮影した画像', // 画像のみ共有時のタイトル
-                        text: '参考画像' // 画像のみ共有時のテキスト（オプション）
+                        title: 'eBay利益計算アプリで撮影した画像', 
+                        text: '参考画像' 
                     });
                     console.log('画像が正常に共有されました');
                 } catch (error) {
