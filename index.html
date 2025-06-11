@@ -214,10 +214,7 @@
                     class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 メールでシェア
             </button>
-            <button id="shareButtonChatwork"
-                    class="flex-1 bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-700 focus:ring-offset-2">
-                Chatworkでシェア
-            </button>
+            <!-- Chatworkボタンは現在の技術的制約により削除されました -->
         </div>
 
         <!-- 開発者情報 -->
@@ -240,7 +237,7 @@
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButtonLine = document.getElementById('shareButtonLine');
         const shareButtonEmail = document.getElementById('shareButtonEmail');
-        const shareButtonChatwork = document.getElementById('shareButtonChatwork'); 
+        // const shareButtonChatwork = document.getElementById('shareButtonChatwork'); // 削除
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
@@ -436,11 +433,11 @@
         });
 
         // Chatworkでシェア
-        shareButtonChatwork.addEventListener('click', () => {
-            const message = createShareMessage();
-            const chatworkUrl = `https://www.chatwork.com/gateway.php?t=chatwork&m=${encodeURIComponent(message)}`;
-            window.open(chatworkUrl, '_blank');
-        });
+        // shareButtonChatwork.addEventListener('click', () => { // 削除
+        //     const message = createShareMessage();
+        //     const chatworkUrl = `https://www.chatwork.com/gateway.php?t=chatwork&m=${encodeURIComponent(message)}`;
+        //     window.open(chatworkUrl, '_blank');
+        // });
 
         // eBay参照ボタンのイベントリスナー
         ebayReferenceButton.addEventListener('click', () => {
