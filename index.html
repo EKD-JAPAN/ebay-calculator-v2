@@ -214,7 +214,10 @@
                     class="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                 メールでシェア
             </button>
-            <!-- Chatworkボタンは現在の技術的制約により削除されました -->
+            <button id="shareButtonSystem"
+                    class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                システムシェア
+            </button>
         </div>
 
         <!-- 開発者情報 -->
@@ -237,7 +240,7 @@
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButtonLine = document.getElementById('shareButtonLine');
         const shareButtonEmail = document.getElementById('shareButtonEmail');
-        // const shareButtonChatwork = document.getElementById('shareButtonChatwork'); // 削除
+        const shareButtonSystem = document.getElementById('shareButtonSystem'); // 追加
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
@@ -363,7 +366,6 @@
         }
 
         // 為替レートAPIキー
-        // v6.exchangerate-api.com を利用する場合、ここに取得したAPIキーを設定してください。（例: "YOUR_EXCHANGERATEAPI_KEY"）
         const apiKey = "1372dbb55066a8afb68619d3"; 
 
         // 為替レートを取得する関数
@@ -373,15 +375,14 @@
             fetchRateButton.disabled = true;
 
             try {
-                // ExchangeRate-APIのエンドポイントを使用
-                const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`; // USDを基準に取得
+                const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`; 
                 const response = await fetch(apiUrl);
                 const data = await response.json();
 
                 if (data.result === 'success' && data.conversion_rates && data.conversion_rates.JPY) {
                     const usdToJpyRate = data.conversion_rates.JPY;
                     exchangeRateJpyUsdInput.value = usdToJpyRate.toFixed(2);
-                    performCalculation(); // レート取得後に計算を実行
+                    performCalculation(); 
                 } else {
                     rateErrorMessageDiv.textContent = 'レートの取得に失敗しました。APIエラーまたはデータ形式が不正です。';
                     rateErrorMessageDiv.classList.remove('hidden');
@@ -432,12 +433,27 @@
             window.open(mailtoUrl, '_blank');
         });
 
-        // Chatworkでシェア
-        // shareButtonChatwork.addEventListener('click', () => { // 削除
-        //     const message = createShareMessage();
-        //     const chatworkUrl = `https://www.chatwork.com/gateway.php?t=chatwork&m=${encodeURIComponent(message)}`;
-        //     window.open(chatworkUrl, '_blank');
-        // });
+        // システムシェアボタンのイベントリスナー
+        shareButtonSystem.addEventListener('click', async () => {
+            if (navigator.share) {
+                const shareText = createShareMessage();
+                try {
+                    await navigator.share({
+                        title: 'eBay利益計算結果',
+                        text: shareText,
+                        url: window.location.href // 現在のアプリのURLを共有
+                    });
+                    console.log('コンテンツが正常に共有されました');
+                } catch (error) {
+                    console.error('コンテンツの共有中にエラーが発生しました:', error);
+                    // ユーザーが共有をキャンセルした場合もエラーになるため、エラーメッセージは出さない
+                }
+            } else {
+                errorMessageDiv.textContent = 'お使いのブラウザはシステムシェアに対応していません。';
+                errorMessageDiv.classList.remove('hidden');
+                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000); // 5秒後にメッセージを非表示
+            }
+        });
 
         // eBay参照ボタンのイベントリスナー
         ebayReferenceButton.addEventListener('click', () => {
@@ -445,7 +461,6 @@
             const productCondition = productConditionSelect.value; 
             let searchQuery = productName;
 
-            // If a condition is selected (not 'none'), append it to the search query
             if (productCondition !== 'none' && productCondition.trim() !== '') { 
                 searchQuery += ` ${productCondition}`; 
             }
