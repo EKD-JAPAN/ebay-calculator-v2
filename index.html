@@ -18,6 +18,13 @@
         #cameraInput {
             display: none;
         }
+        /* 画像プレビューのスタイル */
+        #imagePreview {
+            border: 1px solid #e0e0e0; /* 軽い枠線 */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 軽い影 */
+            object-fit: contain; /* 画像全体を表示し、アスペクト比を維持 */
+            max-height: 300px; /* プレビューの最大高さを設定 */
+        }
     </style>
 </head>
 
@@ -209,9 +216,9 @@
         </div>
 
         <!-- シェアボタン -->
-        <div class="mt-8 flex justify-center space-x-4">
-            <button id="shareButtonSystem"
-                    class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+        <div class="mt-8 flex justify-center">
+            <button id="shareButton"
+                    class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
                 シェア
             </button>
         </div>
@@ -224,11 +231,17 @@
                 カメラ起動 (撮影メモ)
             </button>
             <p class="text-gray-500 text-sm mt-2">
-                ※撮影した画像の直接送信はできません。あくまで撮影メモとしてご利用ください。
+                ※撮影した画像はアプリ内に一時的に表示されます。<br>
+                　スマホ本体への直接保存や送信はできません。<br>
+                　必要な場合は「画像をダウンロード」し、手動で移動してください。
             </p>
             <div id="imagePreviewContainer" class="mt-4 hidden">
                 <p class="text-gray-700 text-sm font-semibold mb-2">撮影画像プレビュー:</p>
                 <img id="imagePreview" class="max-w-full h-auto rounded-lg shadow-md mx-auto" alt="撮影画像プレビュー">
+                <button id="downloadImageButton"
+                        class="mt-4 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 text-sm">
+                    画像をダウンロード
+                </button>
             </div>
         </div>
 
@@ -248,11 +261,12 @@
         const calculateButton = document.getElementById('calculateButton');
         const fetchRateButton = document.getElementById('fetchRateButton');
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
-        const shareButtonSystem = document.getElementById('shareButtonSystem'); 
+        const shareButton = document.getElementById('shareButton'); // 名称変更
         const cameraInput = document.getElementById('cameraInput'); 
         const cameraButton = document.getElementById('cameraButton'); 
         const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
         const imagePreview = document.getElementById('imagePreview'); 
+        const downloadImageButton = document.getElementById('downloadImageButton'); // 追加
 
 
         const resultCategoryDiv = document.getElementById('resultCategory');
@@ -439,10 +453,8 @@
             return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
         }
 
-        // LINEやメールなど個別のシェアボタンは削除し、システムシェアに統一
-
         // シェアボタンのイベントリスナー
-        shareButtonSystem.addEventListener('click', async () => {
+        shareButton.addEventListener('click', async () => { // ボタンIDをshareButtonに変更
             if (navigator.share) {
                 const shareText = createShareMessage();
                 try {
@@ -457,9 +469,9 @@
                     // ユーザーが共有をキャンセルした場合もエラーになるため、エラーメッセージは出さない
                 }
             } else {
-                errorMessageDiv.textContent = 'お使いのブラウザはシェア機能に対応していません。'; // メッセージをより分かりやすく
+                errorMessageDiv.textContent = 'お使いのブラウザはシェア機能に対応していません。'; 
                 errorMessageDiv.classList.remove('hidden');
-                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000); // 5秒後にメッセージを非表示
+                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000); 
             }
         });
 
@@ -504,6 +516,27 @@
             } else {
                 imagePreview.src = '';
                 imagePreviewContainer.classList.add('hidden'); // プレビューコンテナを非表示
+            }
+        });
+
+        // 画像ダウンロードボタンのイベントリスナー
+        downloadImageButton.addEventListener('click', () => {
+            const imageUrl = imagePreview.src;
+            if (imageUrl && imageUrl !== '') {
+                // ダウンロードリンクを作成
+                const a = document.createElement('a');
+                a.href = imageUrl;
+                // ファイル名を生成 (例: ebay_photo_YYYYMMDD_HHMMSS.png)
+                const now = new Date();
+                const filename = `ebay_photo_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.png`;
+                a.download = filename; // ダウンロード時のファイル名を指定
+                document.body.appendChild(a); // DOMに追加 (FireFoxなどで必要)
+                a.click(); // クリックをシミュレートしてダウンロードを開始
+                document.body.removeChild(a); // ダウンロード後、要素を削除
+            } else {
+                errorMessageDiv.textContent = 'ダウンロードする画像がありません。';
+                errorMessageDiv.classList.remove('hidden');
+                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
             }
         });
 
