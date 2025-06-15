@@ -14,11 +14,11 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* カメラ入力要素を非表示にする */
+        /* カメラ入力要素を非表示にする (複数商品モード用は残す)*/
         .camera-input {
             display: none;
         }
-        /* 画像プレビューのスタイル */
+        /* 画像プレビューのスタイル (複数商品モード用は残す)*/
         .image-preview {
             border: 1px solid #e0e0e0; /* 軽い枠線 */
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 軽い影 */
@@ -52,24 +52,6 @@
             Zero One<br>eBay利益計算アプリ
         </h1>
 
-        <!-- 商品カテゴリ -->
-        <div class="mb-5 text-left">
-            <label for="productCategory" class="block text-gray-700 text-sm font-semibold mb-2">
-                商品カテゴリ (任意)
-            </label>
-            <select id="productCategory"
-                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
-                    aria-label="商品カテゴリを選択">
-                <option value="none" selected disabled>選択してください</option>
-                <option value="SLR">SLR</option>
-                <option value="Rangefinder">Rangefinder</option>
-                <option value="point&shoot">Point&Shoot</option>
-                <option value="lens">Lens</option>
-                <option value="accessory">Accessory</option>
-                <option value="other">その他</option>
-            </select>
-        </div>
-
         <!-- 商品名 -->
         <div class="mb-5 text-left">
             <label for="productName" class="block text-gray-700 text-sm font-semibold mb-2">
@@ -78,6 +60,24 @@
             <input type="text" id="productName" placeholder="例: Nikon F3 Body" value=""
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                    aria-label="商品名を入力">
+        </div>
+
+        <!-- 商品カテゴリ -->
+        <div class="mb-5 text-left">
+            <label for="productCategory" class="block text-gray-700 text-sm font-semibold mb-2">
+                商品カテゴリ (任意)
+            </label>
+            <select id="productCategory"
+                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
+                    aria-label="商品カテゴリを選択">
+                <option value="none" selected>選択してください</option>
+                <option value="SLR">SLR</option>
+                <option value="Rangefinder">Rangefinder</option>
+                <option value="point&shoot">Point&Shoot</option>
+                <option value="lens">Lens</option>
+                <option value="accessory">Accessory</option>
+                <option value="other">その他</option>
+            </select>
         </div>
 
         <!-- コンディション入力欄とeBay参照ボタン -->
@@ -89,7 +89,7 @@
                 <select id="productCondition"
                         class="flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
                         aria-label="コンディションを選択">
-                    <option value="none" selected disabled>選択してください</option>
+                    <option value="none" selected>選択してください</option>
                     <option value="TOP MINT">TOP MINT</option>
                     <option value="MINT">MINT</option>
                     <option value="NEAR MINT">NEAR MINT</option>
@@ -240,32 +240,6 @@
             </p>
         </div>
 
-        <!-- カメラ起動と画像メモ -->
-        <div class="mt-4 text-center">
-            <input type="file" accept="image/*" capture="camera" id="cameraInput">
-            <button id="cameraButton"
-                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                カメラ起動 (撮影メモ)
-            </button>
-            <p class="text-gray-500 text-sm mt-2">
-                ※撮影した画像をシェアできます。スマホ本体への直接保存は出来ません。
-            </p>
-            <div id="imagePreviewContainer" class="mt-4 hidden">
-                <p class="text-gray-700 text-sm font-semibold mb-2">撮影画像プレビュー:</p>
-                <img id="imagePreview" class="max-w-full h-auto rounded-lg shadow-md mx-auto" alt="撮影画像プレビュー">
-                <div class="flex justify-center space-x-4 mt-4">
-                    <button id="downloadImageButton"
-                            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 text-sm">
-                        画像をダウンロード
-                    </button>
-                    <button id="shareImageOnlyButton"
-                            class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-sm">
-                        画像をシェア
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- シェアボタン -->
         <div class="mt-8 flex justify-center">
             <button id="shareButton"
@@ -348,13 +322,7 @@
         const fetchRateButton = document.getElementById('fetchRateButton');
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButton = document.getElementById('shareButton'); 
-        const cameraInput = document.getElementById('cameraInput'); // 単一商品用
-        const cameraButton = document.getElementById('cameraButton'); // 単一商品用
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer'); // 単一商品用
-        const imagePreview = document.getElementById('imagePreview'); // 単一商品用
-        const downloadImageButton = document.getElementById('downloadImageButton'); // 単一商品用
-        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton'); // 単一商品用
-        const toggleMultiViewButton = document.getElementById('toggleMultiViewButton');
+        // 単一商品モードのカメラ関連要素は削除されました
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
@@ -568,7 +536,7 @@
             const breakeven = metrics.breakevenPointUsd.toFixed(2);
             const refund = metrics.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
 
-            return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
+            return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}\n`;
         }
 
 
@@ -593,11 +561,7 @@
                     }, calculatedResults),
                 };
 
-                // 撮影した画像があればfilesに含める (単一商品用)
-                if (cameraInput.files && cameraInput.files.length > 0) {
-                    const imageFile = cameraInput.files[0];
-                    shareData.files = [imageFile];
-                }
+                // 単一商品モードでは画像添付機能は削除されました。
 
                 try {
                     await navigator.share(shareData);
@@ -644,66 +608,7 @@
             }
         });
 
-        // カメラ起動ボタンのイベントリスナー (単一商品用)
-        cameraButton.addEventListener('click', () => {
-            cameraInput.click(); 
-        });
-
-        // カメラで撮影した画像が選択された時の処理 (単一商品用)
-        cameraInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imagePreview.src = e.target.result;
-                    imagePreviewContainer.classList.remove('hidden'); 
-                };
-                reader.readAsDataURL(file);
-            } else {
-                imagePreview.src = '';
-                imagePreviewContainer.classList.add('hidden'); 
-            }
-        });
-
-        // 画像ダウンロードボタンのイベントリスナー (単一商品用)
-        downloadImageButton.addEventListener('click', () => {
-            const imageUrl = imagePreview.src;
-            if (imageUrl && imageUrl !== '') {
-                const a = document.createElement('a');
-                a.href = imageUrl;
-                const now = new Date();
-                const filename = `ebay_photo_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.png`;
-                a.download = filename; 
-                document.body.appendChild(a); 
-                a.click(); 
-                document.body.removeChild(a); 
-            } else {
-                errorMessageDiv.textContent = 'ダウンロードする画像がありません。';
-                errorMessageDiv.classList.remove('hidden');
-                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
-            }
-        });
-
-        // 画像のみシェアボタンのイベントリスナー (単一商品用)
-        shareImageOnlyButton.addEventListener('click', async () => {
-            if (navigator.share && cameraInput.files && cameraInput.files.length > 0) {
-                const imageFile = cameraInput.files[0];
-                try {
-                    await navigator.share({
-                        files: [imageFile],
-                        title: 'eBay利益計算アプリで撮影した画像', 
-                        text: '参考画像' 
-                    });
-                    console.log('画像が正常に共有されました');
-                } catch (error) {
-                    console.error('画像の共有中にエラーが発生しました:', error);
-                }
-            } else {
-                errorMessageDiv.textContent = '共有する画像がありません。または、お使いのブラウザは画像シェア機能に対応していません。（HTTPS環境が必要です）';
-                errorMessageDiv.classList.remove('hidden');
-                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
-            }
-        });
+        // 単一商品モードのカメラ関連ボタンと入力のイベントリスナーは削除されました
 
         // 計算ボタンがクリックされた時の処理 (単一商品ビュー)
         calculateButton.addEventListener('click', performSingleItemCalculation);
@@ -777,6 +682,14 @@
                             ${conditionOptionsHtml}
                         </select>
                     </div>
+
+                    <!-- eBay参照ボタンをここに追加 -->
+                    <div class="mb-3 text-right">
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-xs whitespace-nowrap ebay-reference-multi-item-button">
+                            eBay参照
+                        </button>
+                    </div>
+
                     <div class="mb-3 text-left">
                         <label class="block text-gray-700 text-sm font-semibold mb-1">出品価格 ($)</label>
                         <input type="number" class="w-full p-2 border border-gray-300 rounded-lg item-input-listing-price-usd" step="0.01" value="${itemData.listingPriceUsd || ''}">
@@ -785,7 +698,7 @@
                         <label class="block text-gray-700 text-sm font-semibold mb-1">為替レート (円/ドル)</label>
                         <div class="flex items-center space-x-2">
                             <input type="number" class="flex-grow p-2 border border-gray-300 rounded-lg item-input-exchange-rate-jpy-usd" step="0.01" value="${itemData.exchangeRateJpyUsd || ''}">
-                            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded-lg shadow-sm text-xs fetch-rate-multi-item-button">レート取得</button>
+                            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-1 px-2 rounded-lg shadow-sm text-xs fetch-rate-multi-item-button">レート取得</button>
                         </div>
                         <p class="text-blue-500 text-xs mt-1 loading-message-multi hidden">レートを取得中...</p>
                         <p class="text-red-500 text-xs mt-1 error-message-multi hidden">レートの取得に失敗しました。</p>
@@ -823,9 +736,6 @@
                         <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm delete-item-button flex-1">
                             商品を削除
                         </button>
-                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-xs whitespace-nowrap ebay-reference-multi-item-button flex-1">
-                            eBay参照
-                        </button>
                     </div>
                 </div>
             `;
@@ -854,7 +764,7 @@
             };
             multiItemsData.push(newItemData);
 
-            const newItemHtml = createMultiItemInputHtml(newItemUniqueId, multiItemsData.length - 1);
+            const newItemHtml = createMultiItemInputHtml(newItemUniqueId, multiItemsData.length - 1, newItemData);
             multiItemInputsContainer.insertAdjacentHTML('beforeend', newItemHtml);
 
             // 新しく追加された要素に対してイベントリスナーを設定
@@ -863,6 +773,22 @@
 
             // 全体の計算結果テーブルを更新
             renderMultiItemResultsTable(multiItemResultsTable);
+
+            // 新規追加されたアイテムの為替レートを自動取得
+            const newRateInput = newItemElement.querySelector('.item-input-exchange-rate-jpy-usd');
+            const newLoadingMsg = newItemElement.querySelector('.loading-message-multi');
+            const newErrorMsg = newItemElement.querySelector('.error-message-multi');
+            fetchExchangeRate(newRateInput, newLoadingMsg, newErrorMsg, () => {
+                const item = multiItemsData.find(d => d.id === newItemUniqueId);
+                if (item) {
+                    item.exchangeRateJpyUsd = newRateInput.value;
+                    item.metrics = calculateItemMetrics(item);
+                    renderMultiItemResultsTable(multiItemResultsTable);
+                    if (!fullscreenTableView.classList.contains('hidden')) {
+                        renderMultiItemResultsTable(fullscreenTableContainer);
+                    }
+                }
+            });
         }
 
         /**
