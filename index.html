@@ -25,11 +25,28 @@
             object-fit: contain; /* 画像全体を表示し、アスペクト比を維持 */
             max-height: 300px; /* プレビューの最大高さを設定 */
         }
+        /* テーブルのヘッダーを固定する（必要に応じて） */
+        .sticky-header th {
+            position: sticky;
+            top: 0;
+            background-color: #f3f4f6; /* bg-gray-100 */
+            z-index: 10;
+        }
+        /* 全画面表示のスタイル */
+        #fullscreenTableView {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left を 0 に設定 */
+            background-color: white;
+            padding: 1rem;
+            z-index: 50; /* 他の要素より手前に表示 */
+            overflow-y: auto; /* テーブルが縦に長い場合にスクロール可能にする */
+        }
     </style>
 </head>
 
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-auto text-center">
+    <!-- Single Item View (既存のコンテンツ) -->
+    <div id="singleItemView" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-auto text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 rounded-lg text-center">
             Zero One<br>eBay利益計算アプリ
         </h1>
@@ -91,7 +108,7 @@
         <!-- 出品価格 ($) -->
         <div class="mb-5 text-left">
             <label for="listingPriceUsd" class="block text-gray-700 text-sm font-semibold mb-2">
-                出品価格 ($) <span class="text-red-500 font-bold">*</span>
+                出品価格 ($)
             </label>
             <input type="number" id="listingPriceUsd" placeholder="例: 100.00" step="0.01" value=""
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -101,7 +118,7 @@
         <!-- 為替レート (円/ドル) -->
         <div class="mb-5 text-left">
             <label for="exchangeRateJpyUsd" class="block text-gray-700 text-sm font-semibold mb-2">
-                為替レート (円/ドル) <span class="text-red-500 font-bold">*</span>
+                為替レート (円/ドル)
             </label>
             <div class="flex items-center space-x-2">
                 <input type="number" id="exchangeRateJpyUsd" placeholder="例: 155.00" step="0.01" value=""
@@ -123,7 +140,7 @@
         <!-- 仕入価格 (円) -->
         <div class="mb-5 text-left">
             <label for="costPriceJpy" class="block text-gray-700 text-sm font-semibold mb-2">
-                仕入価格 (円) <span class="text-red-500 font-bold">*</span> <span class="font-normal text-gray-500">(税込額を入力)</span>
+                仕入価格 (円) <span class="font-normal text-gray-500">(税込額を入力)</span>
             </label>
             <input type="number" id="costPriceJpy" placeholder="例: 5000" step="1" value=""
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -133,7 +150,7 @@
         <!-- 手数料 (%) -->
         <div class="mb-5 text-left">
             <label for="commissionPercentage" class="block text-gray-700 text-sm font-semibold mb-2">
-                手数料 (%) <span class="text-red-500 font-bold">*</span>
+                手数料 (%)
             </label>
             <input type="number" id="commissionPercentage" placeholder="例: 15" step="0.1" value="15"
                    class="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200"
@@ -192,28 +209,28 @@
             </div>
 
             <!-- 利益率 -->
-            <div class="bg-gray-100 p-2 rounded-lg mb-3"> <!-- p-4からp-2に短縮 -->
+            <div class="bg-gray-100 p-2 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">利益率</p>
                 <div id="profitMarginResult"
-                     class="text-xl font-extrabold text-blue-600 break-all min-h-[32px] flex items-center justify-center"> <!-- text-3xlからtext-xl、min-h-[48px]からmin-h-[32px]に短縮 -->
+                     class="text-xl font-extrabold text-blue-600 break-all min-h-[32px] flex items-center justify-center">
                     --- %
                 </div>
             </div>
 
             <!-- 損益分岐点 -->
-            <div class="bg-gray-100 p-2 rounded-lg mb-3"> <!-- p-4からp-2に短縮 -->
+            <div class="bg-gray-100 p-2 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">損益分岐点</p>
                 <div id="breakevenPointResult"
-                     class="text-xl font-extrabold text-red-600 break-all min-h-[32px] flex items-center justify-center"> <!-- text-3xlからtext-xl、min-h-[48px]からmin-h-[32px]に短縮 -->
+                     class="text-xl font-extrabold text-red-600 break-all min-h-[32px] flex items-center justify-center">
                     --- ドル
                 </div>
             </div>
 
             <!-- 消費税還付金 -->
-            <div class="bg-gray-100 p-2 rounded-lg"> <!-- p-4からp-2に短縮 -->
+            <div class="bg-gray-100 p-2 rounded-lg">
                 <p class="text-gray-600 text-sm font-semibold mb-1">消費税還付金</p>
                 <div id="consumptionTaxRefundResult"
-                     class="text-xl font-extrabold text-purple-600 break-all min-h-[32px] flex items-center justify-center"> <!-- text-3xlからtext-xl、min-h-[48px]からmin-h-[32px]に短縮 -->
+                     class="text-xl font-extrabold text-purple-600 break-all min-h-[32px] flex items-center justify-center">
                     --- 円
                 </div>
             </div>
@@ -222,7 +239,7 @@
             </p>
         </div>
 
-        <!-- カメラ起動と画像メモ (位置変更) -->
+        <!-- カメラ起動と画像メモ -->
         <div class="mt-4 text-center">
             <input type="file" accept="image/*" capture="camera" id="cameraInput">
             <button id="cameraButton"
@@ -248,7 +265,7 @@
             </div>
         </div>
 
-        <!-- シェアボタン (位置変更) -->
+        <!-- シェアボタン -->
         <div class="mt-8 flex justify-center">
             <button id="shareButton"
                     class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
@@ -256,10 +273,67 @@
             </button>
         </div>
 
+        <!-- 複数商品モードへの切り替えボタン -->
+        <button id="toggleMultiViewButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 mt-8">
+            複数商品モード
+        </button>
+    </div>
+
+    <!-- Multi Item View (最初は非表示) -->
+    <div id="multiItemView" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl mx-auto text-center hidden">
+        <button id="toggleSingleViewButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 mb-8">
+            単一商品モードに戻る
+        </button>
+
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">複数商品入力</h2>
+
+        <div id="multiItemInputsContainer">
+            <!-- 動的に追加される商品入力フォームがここに入る -->
+        </div>
+
+        <button id="addItemButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 mt-6">
+            + 商品を追加
+        </button>
+
+        <h2 class="text-xl font-semibold text-gray-700 mt-8 mb-4">
+            複数商品計算結果一覧
+        </h2>
+        <!-- 全画面表示ボタンを追加 -->
+        <button id="viewFullscreenButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mb-4">
+            全画面表示
+        </button>
+        
+        <div id="multiItemResultsTable" class="overflow-x-auto">
+            <!-- 複数商品の結果テーブルがここに生成される -->
+        </div>
+
+        <div class="mt-8 flex justify-center space-x-4">
+            <button id="shareAllItemsButton" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2">
+                全ての計算結果をシェア
+            </button>
+            <button id="exportCsvButton" class="flex-1 bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2">
+                CSVエクスポート
+            </button>
+        </div>
+    </div>
+
+    <!-- Fullscreen Table View (最初は非表示) -->
+    <div id="fullscreenTableView" class="hidden">
+        <div class="flex justify-between items-center bg-gray-100 p-4 rounded-b-lg shadow-md">
+            <h2 class="text-2xl font-bold text-gray-800">複数商品計算結果一覧 (全画面)</h2>
+            <button id="closeFullscreenButton" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                閉じる
+            </button>
+        </div>
+        <div id="fullscreenTableContainer" class="p-4">
+            <!-- 全画面表示用のテーブルがここに生成される -->
+        </div>
     </div>
 
     <script>
-        // HTML要素への参照を取得
+        // --- HTML要素への参照を取得 ---
+        // Single Item View Elements
+        const singleItemView = document.getElementById('singleItemView');
         const productCategorySelect = document.getElementById('productCategory');
         const productNameInput = document.getElementById('productName');
         const productConditionSelect = document.getElementById('productCondition'); 
@@ -279,7 +353,7 @@
         const imagePreview = document.getElementById('imagePreview'); 
         const downloadImageButton = document.getElementById('downloadImageButton'); 
         const shareImageOnlyButton = document.getElementById('shareImageOnlyButton');
-
+        const toggleMultiViewButton = document.getElementById('toggleMultiViewButton');
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
@@ -292,128 +366,140 @@
         const loadingMessageDiv = document.getElementById('loadingMessage');
         const rateErrorMessageDiv = document.getElementById('rateErrorMessage');
 
-        // 計算結果を保持する変数
+        // Multi Item View Elements
+        const multiItemView = document.getElementById('multiItemView');
+        const toggleSingleViewButton = document.getElementById('toggleSingleViewButton');
+        const multiItemInputsContainer = document.getElementById('multiItemInputsContainer');
+        const addItemButton = document.getElementById('addItemButton');
+        const multiItemResultsTable = document.getElementById('multiItemResultsTable');
+        const shareAllItemsButton = document.getElementById('shareAllItemsButton');
+        const exportCsvButton = document.getElementById('exportCsvButton');
+        const viewFullscreenButton = document.getElementById('viewFullscreenButton'); // 全画面表示ボタン
+
+        // Fullscreen View Elements
+        const fullscreenTableView = document.getElementById('fullscreenTableView');
+        const closeFullscreenButton = document.getElementById('closeFullscreenButton');
+        const fullscreenTableContainer = document.getElementById('fullscreenTableContainer');
+
+        // --- グローバル変数 ---
+        // 計算結果を保持する変数 (単一商品用)
         let calculatedResults = {
             expectedProfitJpy: 0,
             profitMargin: 0,
             breakevenPointUsd: 0,
             consumptionTaxRefundJpy: 0
         };
-
-        // 最後に参照したeBayリンクを保持する変数
+        // 最後に参照したeBayリンクを保持する変数 (単一商品用)
         let lastEbayReferenceUrl = '';
 
-        // 計算を実行する関数
-        function performCalculation() {
-            // エラーメッセージと結果をリセット
-            errorMessageDiv.classList.add('hidden'); // エラーメッセージを常に非表示から開始
-            expectedProfitResultDiv.textContent = '--- 円';
-            profitMarginResultDiv.textContent = '--- %';
-            breakevenPointResultDiv.textContent = '--- ドル';
-            consumptionTaxRefundResultDiv.textContent = '--- 円';
-            
-            // 計算前の商品情報表示は「---」にする
-            resultCategoryDiv.textContent = 'カテゴリ: ---';
-            resultNameDiv.textContent = '商品名: ---';
-            resultConditionDiv.textContent = 'コンディション: ---'; 
-
-            // 入力値を取得し、数値に変換
-            const listingPriceUsd = parseFloat(listingPriceUsdInput.value);
-            const exchangeRateJpyUsd = parseFloat(exchangeRateJpyUsdInput.value);
-            const costPriceJpy = parseFloat(costPriceJpyInput.value);
-            const commissionPercentage = parseFloat(commissionPercentageInput.value);
-            const shippingCostJpy = parseFloat(shippingCostJpyInput.value); 
-
-            // 必須入力項目のバリデーションを強化
-            let validationMessages = [];
-
-            if (isNaN(listingPriceUsd) || listingPriceUsd < 0 || listingPriceUsdInput.value.trim() === '') {
-                validationMessages.push('「出品価格 ($)」に有効な数値を入力してください。');
-            }
-            if (isNaN(exchangeRateJpyUsd) || exchangeRateJpyUsd <= 0 || exchangeRateJpyUsdInput.value.trim() === '') {
-                validationMessages.push('「為替レート (円/ドル)」に有効な数値を入力してください。');
-            }
-            if (isNaN(costPriceJpy) || costPriceJpy < 0 || costPriceJpyInput.value.trim() === '') {
-                validationMessages.push('「仕入価格 (円)」に有効な数値を入力してください。');
-            }
-            if (isNaN(commissionPercentage) || commissionPercentage < 0 || commissionPercentage > 100 || commissionPercentageInput.value.trim() === '') {
-                validationMessages.push('「手数料 (%)」に有効な数値を入力してください。(0～100%)');
-            }
-            // 送料は必須ではないので、isNaN(shippingCostJpy) は value="" の場合は 0 として扱う
-            const finalShippingCostJpy = isNaN(shippingCostJpy) ? 0 : shippingCostJpy;
-
-
-            if (validationMessages.length > 0) {
-                errorMessageDiv.innerHTML = validationMessages.join('<br>');
-                errorMessageDiv.classList.remove('hidden'); // エラーがある場合のみ表示
-                return;
-            }
-
-            // 商品カテゴリと商品名を結果欄に表示 (バリデーション後に設定)
-            const selectedCategory = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
-            const inputProductName = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '未入力';
-            const selectedCondition = productConditionSelect.value !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '未選択'; 
-            resultCategoryDiv.textContent = `カテゴリ: ${selectedCategory}`;
-            resultNameDiv.textContent = `商品名: ${inputProductName}`;
-            resultConditionDiv.textContent = `コンディション: ${selectedCondition}`; 
-
-            // 計算式の定義
-
-            // 売上 (円) = 出品価格 ($) × 為替レート (円/ドル)
-            const revenueJpy = listingPriceUsd * exchangeRateJpyUsd;
-
-            // 手数料 (ドル) = 出品価格 ($) × 手数料率 (%)
-            const commissionUsd = listingPriceUsd * (commissionPercentage / 100);
-            // 手数料 (円) = 手数料 (ドル) × 為替レート (円/ドル)
-            const commissionJpy = commissionUsd * exchangeRateJpyUsd;
-
-            // 消費税還付金 (円) = 仕入価格 (円) × 0.10 (10%で計算)
-            const consumptionTaxRefundJpy = costPriceJpy * 0.10;
-
-            // 1. 想定利益 (JPY)
-            // 想定利益 (円) = 売上 (円) - 手数料 (円) - 送料 (円) - 仕入価格 (円)
-            // 注: 消費税還付金は別途表示し、想定利益には含めない
-            const expectedProfitJpy = revenueJpy - commissionJpy - finalShippingCostJpy - costPriceJpy;
-
-            // 2. 利益率 (%)
-            // 利益率 (%) = (想定利益 (円) / 売上 (円)) × 100
-            // 売上が0の場合は計算不可
-            const profitMargin = (revenueJpy !== 0) ? (expectedProfitJpy / revenueJpy) * 100 : 0;
-
-            // 3. 損益分岐点 (USD)
-            // 想定利益が0になる出品価格 ($)
-            // BEP_USD * exchangeRateJpyUsd - (BEP_USD * (commissionPercentage / 100)) * exchangeRateJpyUsd - shippingCostJpy - costPriceJpy = 0
-            // BEP_USD * exchangeRateJpyUsd * (1 - commissionPercentage / 100) = shippingCostJpy + costPriceJpy
-            // BEP_USD = (shippingCostJpy + costPriceJpy) / (exchangeRateJpyUsd * (1 - commissionPercentage / 100))
-            let breakevenPointUsd;
-            const denominator = exchangeRateJpyUsd * (1 - commissionPercentage / 100);
-            if (denominator > 0) {
-                breakevenPointUsd = (costPriceJpy + finalShippingCostJpy) / denominator;
-            } else {
-                breakevenPointUsd = Infinity; // もしくは適切なエラー表示
-            }
-
-            // 結果を更新
-            calculatedResults.expectedProfitJpy = expectedProfitJpy;
-            calculatedResults.profitMargin = profitMargin;
-            calculatedResults.breakevenPointUsd = breakevenPointUsd;
-            calculatedResults.consumptionTaxRefundJpy = consumptionTaxRefundJpy;
-
-            // 結果を表示
-            expectedProfitResultDiv.textContent = `${expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}`;
-            profitMarginResultDiv.textContent = `${profitMargin.toFixed(2)} %`;
-            breakevenPointResultDiv.textContent = `$ ${breakevenPointUsd.toFixed(2)}`;
-            consumptionTaxRefundResultDiv.textContent = `${consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}`;
-        }
+        // 複数商品データを保持する配列
+        let multiItemsData = [];
+        let itemIndexCounter = 0; // 商品のユニークIDを生成するためのカウンター
 
         // 為替レートAPIキー
         const apiKey = "1372dbb55066a8afb68619d3"; 
 
-        // 為替レートを取得する関数
-        async function fetchExchangeRate() {
-            loadingMessageDiv.classList.remove('hidden');
-            rateErrorMessageDiv.classList.add('hidden');
-            fetchRateButton.disabled = true;
+        // --- 関数定義 ---
+
+        /**
+         * 個々の商品オブジェクトの計算を実行し、結果を返す
+         * @param {object} item - 商品データを含むオブジェクト
+         * @returns {object} 計算結果とエラー情報を含むオブジェクト
+         */
+        function calculateItemMetrics(item) {
+            const listingPriceUsd = parseFloat(item.listingPriceUsd) || 0;
+            const exchangeRateJpyUsd = parseFloat(item.exchangeRateJpyUsd) || 0;
+            const costPriceJpy = parseFloat(item.costPriceJpy) || 0;
+            const commissionPercentage = parseFloat(item.commissionPercentage) || 0;
+            const shippingCostJpy = parseFloat(item.shippingCostJpy) || 0;
+
+            let validationError = null;
+            if (exchangeRateJpyUsd <= 0 && listingPriceUsd > 0) {
+                validationError = '有効な為替レートを入力してください。';
+            }
+
+            const revenueJpy = listingPriceUsd * exchangeRateJpyUsd;
+            const commissionUsd = listingPriceUsd * (commissionPercentage / 100);
+            const commissionJpy = commissionUsd * exchangeRateJpyUsd;
+            const consumptionTaxRefundJpy = costPriceJpy * 0.10;
+            const expectedProfitJpy = revenueJpy - commissionJpy - shippingCostJpy - costPriceJpy;
+
+            let breakevenPointUsd;
+            const denominator = exchangeRateJpyUsd * (1 - commissionPercentage / 100);
+            if (denominator > 0) {
+                breakevenPointUsd = (costPriceJpy + shippingCostJpy) / denominator;
+            } else {
+                breakevenPointUsd = Infinity;
+            }
+
+            const profitMargin = (revenueJpy !== 0) ? (expectedProfitJpy / revenueJpy) * 100 : 0;
+
+            return {
+                expectedProfitJpy: expectedProfitJpy,
+                profitMargin: profitMargin,
+                breakevenPointUsd: breakevenPointUsd,
+                consumptionTaxRefundJpy: consumptionTaxRefundJpy,
+                error: validationError
+            };
+        }
+
+        /**
+         * 単一商品ビューの表示を更新する
+         * @param {object} itemData - 入力データ
+         * @param {object} metrics - 計算結果のメトリクス
+         */
+        function updateSingleItemDisplay(itemData, metrics) {
+            expectedProfitResultDiv.textContent = `${metrics.expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}`;
+            profitMarginResultDiv.textContent = `${metrics.profitMargin.toFixed(2)} %`;
+            breakevenPointResultDiv.textContent = `$ ${metrics.breakevenPointUsd.toFixed(2)}`;
+            consumptionTaxRefundResultDiv.textContent = `${metrics.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' })}`;
+
+            resultCategoryDiv.textContent = `カテゴリ: ${itemData.productCategory !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '---'}`;
+            resultNameDiv.textContent = `商品名: ${itemData.productName.trim() !== '' ? itemData.productName.trim() : '---'}`;
+            resultConditionDiv.textContent = `コンディション: ${itemData.productCondition !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '---'}`;
+
+            if (metrics.error) {
+                errorMessageDiv.innerHTML = metrics.error;
+                errorMessageDiv.classList.remove('hidden');
+            } else {
+                errorMessageDiv.classList.add('hidden');
+            }
+        }
+
+        /**
+         * 単一商品ビューの計算を実行するメイン関数
+         */
+        function performSingleItemCalculation() {
+            // 単一商品ビューからデータを収集
+            const itemData = {
+                listingPriceUsd: listingPriceUsdInput.value,
+                exchangeRateJpyUsd: exchangeRateJpyUsdInput.value,
+                costPriceJpy: costPriceJpyInput.value,
+                commissionPercentage: commissionPercentageInput.value,
+                shippingCostJpy: shippingCostJpyInput.value,
+                productCategory: productCategorySelect.value,
+                productName: productNameInput.value,
+                productCondition: productConditionSelect.value,
+                memoText: memoTextInput.value,
+                ebayReferenceUrl: lastEbayReferenceUrl // 単一商品モードではグローバルの参照URLを使用
+            };
+
+            const metrics = calculateItemMetrics(itemData);
+            calculatedResults = metrics; // シェアのためにグローバル変数に結果を保存
+            updateSingleItemDisplay(itemData, metrics);
+        }
+
+        /**
+         * 為替レートを取得する関数
+         * @param {HTMLElement} rateInput - レートを更新するinput要素
+         * @param {HTMLElement} loadingMsg - ローディングメッセージ要素
+         * @param {HTMLElement} errorMsg - エラーメッセージ要素
+         * @param {Function} [callback] - レート取得後に実行するコールバック関数 (計算関数など)
+         */
+        async function fetchExchangeRate(rateInput, loadingMsg, errorMsg, callback = null) {
+            loadingMsg.classList.remove('hidden');
+            errorMsg.classList.add('hidden');
+            rateInput.disabled = true; // 入力欄を一時的に無効化
 
             try {
                 const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`; 
@@ -422,24 +508,31 @@
 
                 if (data.result === 'success' && data.conversion_rates && data.conversion_rates.JPY) {
                     const usdToJpyRate = data.conversion_rates.JPY;
-                    exchangeRateJpyUsdInput.value = usdToJpyRate.toFixed(2);
-                    performCalculation(); 
+                    rateInput.value = usdToJpyRate.toFixed(2);
+                    if (callback) {
+                        callback(); // レート取得後にコールバックを実行
+                    }
                 } else {
-                    rateErrorMessageDiv.textContent = 'レートの取得に失敗しました。APIエラーまたはデータ形式が不正です。';
-                    rateErrorMessageDiv.classList.remove('hidden');
+                    errorMsg.textContent = 'レートの取得に失敗しました。APIエラーまたはデータ形式が不正です。';
+                    errorMsg.classList.remove('hidden');
                 }
             } catch (error) {
                 console.error('為替レートの取得中にエラーが発生しました:', error);
-                rateErrorMessageDiv.textContent = 'レートの取得中にネットワークエラーが発生しました。';
-                rateErrorMessageDiv.classList.remove('hidden');
+                errorMsg.textContent = 'レートの取得中にネットワークエラーが発生しました。';
+                errorMsg.classList.remove('hidden');
             } finally {
-                loadingMessageDiv.classList.add('hidden');
-                fetchRateButton.disabled = false;
+                loadingMsg.classList.add('hidden');
+                rateInput.disabled = false; // 入力欄を有効化
             }
         }
 
-        // シェアメッセージを作成する関数
-        function createShareMessage() {
+        /**
+         * シェアメッセージを作成する関数 (単一商品用)
+         * @param {object} itemData - 商品の入力データ
+         * @param {object} metrics - 商品の計算結果
+         * @returns {string} フォーマットされたシェアメッセージ
+         */
+        function createShareMessage(itemData, metrics) {
             const now = new Date();
             const year = now.getFullYear();
             const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -448,38 +541,55 @@
             const minutes = now.getMinutes().toString().padStart(2, '0');
             const timestamp = `${year}/${month}/${day} ${hours}:${minutes}`;
 
-            const category = productCategorySelect.value !== 'none' ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '未選択';
-            const name = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '商品名なし';
-            const condition = productConditionSelect.value !== 'none' ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '未入力'; 
-            const listingPrice = listingPriceUsdInput.value ? `$${parseFloat(listingPriceUsdInput.value).toFixed(2)}` : '未入力';
-            const rate = exchangeRateJpyUsdInput.value ? parseFloat(exchangeRateJpyUsdInput.value).toFixed(2) : '未入力';
-            const cost = costPriceJpyInput.value ? parseFloat(costPriceJpyInput.value).toLocaleString('ja-JP') : '未入力';
-            const commission = commissionPercentageInput.value ? parseFloat(commissionPercentageInput.value).toFixed(1) : '未入力';
-            const shipping = shippingCostJpyInput.value ? parseFloat(shippingCostJpyInput.value).toLocaleString('ja-JP') : '未入力';
-            const memo = memoTextInput.value.trim() !== '' ? `\nメモ: ${memoTextInput.value.trim()}\n` : '';
+            // 実際の入力値または'---'を使用
+            // productCategorySelect と productConditionSelect は単一商品モードの要素を参照
+            const category = itemData.productCategory !== 'none' && productCategorySelect.options[productCategorySelect.selectedIndex] ? productCategorySelect.options[productCategorySelect.selectedIndex].text : '---';
+            const name = itemData.productName.trim() !== '' ? itemData.productName.trim() : '---';
+            const condition = itemData.productCondition !== 'none' && productConditionSelect.options[productConditionSelect.selectedIndex] ? productConditionSelect.options[productConditionSelect.selectedIndex].text : '---'; 
+            
+            const listingPrice = itemData.listingPriceUsd.trim() !== '' ? `$${parseFloat(itemData.listingPriceUsd).toFixed(2)}` : '---';
+            const rate = itemData.exchangeRateJpyUsd.trim() !== '' ? parseFloat(itemData.exchangeRateJpyUsd).toFixed(2) : '---';
+            const cost = itemData.costPriceJpy.trim() !== '' ? parseFloat(itemData.costPriceJpy).toLocaleString('ja-JP') : '---';
+            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(itemData.commissionPercentage).toFixed(1) : '---';
+            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(itemData.shippingCostJpy).toLocaleString('ja-JP') : '---';
+            
+            const memo = itemData.memoText.trim() !== '' ? `\nメモ: ${itemData.memoText.trim()}\n` : '';
             
             // eBay参照リンクをハイパーリンク形式で生成
             let ebayLink = '';
-            if (lastEbayReferenceUrl !== '') {
-                const productNameForLink = productNameInput.value.trim() !== '' ? productNameInput.value.trim() : '商品名なし';
-                ebayLink = `\neBay参照リンク: [${productNameForLink}_ebay sold item](${lastEbayReferenceUrl})\n`;
+            if (itemData.ebayReferenceUrl && itemData.ebayReferenceUrl !== '') {
+                const productNameForLink = itemData.productName.trim() !== '' ? itemData.productName.trim() : '商品名なし';
+                ebayLink = `\neBay参照リンク: [${productNameForLink}_ebay sold item](${itemData.ebayReferenceUrl})\n`;
             }
 
-            const profit = calculatedResults.expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
-            const profitMargin = calculatedResults.profitMargin.toFixed(2);
-            const breakeven = calculatedResults.breakevenPointUsd.toFixed(2);
-            const refund = calculatedResults.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
+            const profit = metrics.expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
+            const profitMargin = metrics.profitMargin.toFixed(2);
+            const breakeven = metrics.breakevenPointUsd.toFixed(2);
+            const refund = metrics.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' });
 
             return `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${category}\n商品名: ${name}\nコンディション: ${condition}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}`;
         }
+
+
+        // --- イベントリスナー (単一商品ビュー) ---
 
         // メインのシェアボタンのイベントリスナー
         shareButton.addEventListener('click', async () => { 
             if (navigator.share) {
                 const shareData = {
                     title: 'eBay利益計算結果',
-                    text: createShareMessage(),
-                    // url: window.location.href // 本アプリのリンクは不要なので含めない
+                    text: createShareMessage({ // 現在のフォームの値を渡す
+                        productCategory: productCategorySelect.value,
+                        productName: productNameInput.value,
+                        productCondition: productConditionSelect.value,
+                        listingPriceUsd: listingPriceUsdInput.value,
+                        exchangeRateJpyUsd: exchangeRateJpyUsdInput.value,
+                        costPriceJpy: costPriceJpyInput.value,
+                        commissionPercentage: commissionPercentageInput.value,
+                        shippingCostJpy: shippingCostJpyInput.value,
+                        memoText: memoTextInput.value,
+                        ebayReferenceUrl: lastEbayReferenceUrl
+                    }, calculatedResults),
                 };
 
                 // 撮影した画像があればfilesに含める
@@ -505,7 +615,7 @@
         ebayReferenceButton.addEventListener('click', () => {
             const productName = productNameInput.value.trim();
             const productCondition = productConditionSelect.value;
-            const productCategory = productCategorySelect.value; // カテゴリを取得
+            const productCategory = productCategorySelect.value; 
 
             let searchQueryParts = [];
             if (productCategory !== 'none' && productCategory.trim() !== '') {
@@ -518,13 +628,13 @@
                 searchQueryParts.push(productCondition);
             }
 
-            const searchQuery = searchQueryParts.join(' '); // スペースで結合
+            const searchQuery = searchQueryParts.join(' '); 
 
             if (searchQuery.trim() !== '') {
                 const encodedSearchQuery = encodeURIComponent(searchQuery);
                 const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedSearchQuery}&LH_Complete=1&LH_Sold=1&_sop=3`;
                 
-                lastEbayReferenceUrl = ebaySearchUrl;
+                lastEbayReferenceUrl = ebaySearchUrl; // グローバル変数に保存
 
                 window.open(ebaySearchUrl, '_blank');
             } else {
@@ -594,17 +704,560 @@
             }
         });
 
+        // 計算ボタンがクリックされた時の処理 (単一商品ビュー)
+        calculateButton.addEventListener('click', performSingleItemCalculation);
 
-        // 計算ボタンがクリックされた時の処理
-        calculateButton.addEventListener('click', performCalculation);
+        // レート取得ボタンがクリックされた時の処理 (単一商品ビュー)
+        fetchRateButton.addEventListener('click', () => {
+            fetchExchangeRate(exchangeRateJpyUsdInput, loadingMessageDiv, rateErrorMessageDiv, performSingleItemCalculation);
+        });
 
-        // レート取得ボタンがクリックされた時の処理
-        fetchRateButton.addEventListener('click', fetchExchangeRate);
+        // --- ビュー切り替え機能 ---
+        toggleMultiViewButton.addEventListener('click', () => {
+            singleItemView.classList.add('hidden');
+            multiItemView.classList.remove('hidden');
+            if (multiItemsData.length === 0) {
+                // 初めて複数商品モードに切り替わる場合、初期商品を1つ追加
+                addItem();
+            } else {
+                // 既に商品がある場合は、表示を更新
+                renderMultiItemResultsTable(multiItemResultsTable);
+            }
+        });
 
-        // ページ読み込み時に一度レートを取得し、初期計算を実行
+        toggleSingleViewButton.addEventListener('click', () => {
+            multiItemView.classList.add('hidden');
+            singleItemView.classList.remove('hidden');
+            // 単一商品モードに戻る際に、現在の入力値で再計算を実行
+            performSingleItemCalculation();
+        });
+
+
+        // --- 複数商品モードの機能 ---
+
+        /**
+         * 新しい商品入力フォームのHTMLを生成する
+         * @param {number} itemIndex - 商品のインデックス
+         * @param {object} [itemData={}] - 初期データ（編集時に使用）
+         * @returns {string} 商品入力フォームのHTML文字列
+         */
+        function createMultiItemInputHtml(itemIndex, itemData = {}) {
+            // 現在のselect要素からオプションを動的に生成
+            const categoryOptionsHtml = Array.from(productCategorySelect.options).map(option => `
+                <option value="${option.value}" ${itemData.productCategory === option.value ? 'selected' : ''}>${option.textContent}</option>
+            `).join('');
+
+            const conditionOptionsHtml = Array.from(productConditionSelect.options).map(option => `
+                <option value="${option.value}" ${itemData.productCondition === option.value ? 'selected' : ''}>${option.textContent}</option>
+            `).join('');
+
+            return `
+                <div class="item-input-block bg-gray-50 p-4 rounded-xl shadow-inner mb-4" data-item-index="${itemIndex}">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">商品 ${itemIndex + 1}</h3>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">商品名 (任意)</label>
+                        <input type="text" class="w-full p-2 border border-gray-300 rounded-lg item-input-product-name" placeholder="例: Nikon F3 Body" value="${itemData.productName || ''}">
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">カテゴリ (任意)</label>
+                        <select class="w-full p-2 border border-gray-300 rounded-lg item-input-product-category">
+                            ${categoryOptionsHtml}
+                        </select>
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">コンディション (任意)</label>
+                        <select class="w-full p-2 border border-gray-300 rounded-lg item-input-product-condition">
+                            ${conditionOptionsHtml}
+                        </select>
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">出品価格 ($)</label>
+                        <input type="number" class="w-full p-2 border border-gray-300 rounded-lg item-input-listing-price-usd" step="0.01" value="${itemData.listingPriceUsd || ''}">
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">為替レート (円/ドル)</label>
+                        <div class="flex items-center space-x-2">
+                            <input type="number" class="flex-grow p-2 border border-gray-300 rounded-lg item-input-exchange-rate-jpy-usd" step="0.01" value="${itemData.exchangeRateJpyUsd || ''}">
+                            <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-3 rounded-lg shadow-sm text-xs fetch-rate-multi-item-button">レート取得</button>
+                        </div>
+                        <p class="text-blue-500 text-xs mt-1 loading-message-multi hidden">レートを取得中...</p>
+                        <p class="text-red-500 text-xs mt-1 error-message-multi hidden">レートの取得に失敗しました。</p>
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">仕入価格 (円)</label>
+                        <input type="number" class="w-full p-2 border border-gray-300 rounded-lg item-input-cost-price-jpy" step="1" value="${itemData.costPriceJpy || ''}">
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">手数料 (%)</label>
+                        <input type="number" class="w-full p-2 border border-gray-300 rounded-lg item-input-commission-percentage" step="0.1" value="${itemData.commissionPercentage || '15'}">
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">送料 (円)</label>
+                        <input type="number" class="w-full p-2 border border-gray-300 rounded-lg item-input-shipping-cost-jpy" step="1" value="${itemData.shippingCostJpy || ''}">
+                    </div>
+                    <div class="mb-3 text-left">
+                        <label class="block text-gray-700 text-sm font-semibold mb-1">メモ (任意)</label>
+                        <textarea class="w-full p-2 border border-gray-300 rounded-lg item-input-memo-text" rows="2">${itemData.memoText || ''}</textarea>
+                    </div>
+                    <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm mt-2 delete-item-button">
+                        商品を削除
+                    </button>
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-xs whitespace-nowrap ml-2 ebay-reference-multi-item-button">
+                        eBay参照
+                    </button>
+                </div>
+            `;
+        }
+
+        /**
+         * 新しい商品を追加する
+         */
+        function addItem() {
+            const newItemIndex = multiItemsData.length; // 現在の配列の長さをインデックスとする
+            const newItemData = {
+                id: newItemIndex, // ユニークIDとして使用
+                productCategory: 'none',
+                productName: '',
+                productCondition: 'none',
+                listingPriceUsd: '',
+                exchangeRateJpyUsd: '',
+                costPriceJpy: '',
+                commissionPercentage: '15',
+                shippingCostJpy: '',
+                memoText: '',
+                ebayReferenceUrl: '', // 各商品ごとの参照URL
+                metrics: {} // 計算結果を格納
+            };
+            multiItemsData.push(newItemData);
+
+            const newItemHtml = createMultiItemInputHtml(newItemIndex);
+            multiItemInputsContainer.insertAdjacentHTML('beforeend', newItemHtml);
+
+            // 新しく追加された要素に対してイベントリスナーを設定
+            const newItemElement = multiItemInputsContainer.lastElementChild;
+            attachMultiItemEventListeners(newItemElement, newItemIndex);
+
+            // 全体の計算結果テーブルを更新
+            renderMultiItemResultsTable(multiItemResultsTable);
+        }
+
+        /**
+         * 複数商品の入力値変更を監視し、データを更新・再計算する
+         * @param {Event} event - change or input event
+         */
+        function handleMultiItemInput(event) {
+            const target = event.target;
+            const itemBlock = target.closest('.item-input-block');
+            if (!itemBlock) return;
+
+            const itemIndex = parseInt(itemBlock.dataset.itemIndex);
+            // multiItemsDataが再インデックスされる可能性があるので、idでアイテムを見つける
+            const item = multiItemsData.find(d => d.id === itemIndex);
+            if (!item) return;
+
+            // 入力タイプに応じてitemオブジェクトを更新
+            if (target.classList.contains('item-input-product-name')) {
+                item.productName = target.value;
+            } else if (target.classList.contains('item-input-product-category')) {
+                item.productCategory = target.value;
+            } else if (target.classList.contains('item-input-product-condition')) {
+                item.productCondition = target.value;
+            } else if (target.classList.contains('item-input-listing-price-usd')) {
+                item.listingPriceUsd = target.value;
+            } else if (target.classList.contains('item-input-exchange-rate-jpy-usd')) {
+                item.exchangeRateJpyUsd = target.value;
+            } else if (target.classList.contains('item-input-cost-price-jpy')) {
+                item.costPriceJpy = target.value;
+            } else if (target.classList.contains('item-input-commission-percentage')) {
+                item.commissionPercentage = target.value;
+            } else if (target.classList.contains('item-input-shipping-cost-jpy')) {
+                item.shippingCostJpy = target.value;
+            } else if (target.classList.contains('item-input-memo-text')) {
+                item.memoText = target.value;
+            }
+
+            // 計算を実行し、結果をitemオブジェクトに保存
+            item.metrics = calculateItemMetrics(item);
+            renderMultiItemResultsTable(multiItemResultsTable); // 結果テーブルを更新
+            if (!fullscreenTableView.classList.contains('hidden')) { // 全画面表示も更新
+                renderMultiItemResultsTable(fullscreenTableContainer);
+            }
+        }
+
+        /**
+         * 複数商品入力フォームにイベントリスナーをアタッチする
+         * @param {HTMLElement} itemElement - 個別商品フォームのDOM要素
+         * @param {number} index - その商品のインデックス
+         */
+        function attachMultiItemEventListeners(itemElement, index) {
+            // 入力フィールドのイベントリスナー（変更を即座に反映）
+            itemElement.querySelectorAll('input, select, textarea').forEach(input => {
+                input.addEventListener('input', handleMultiItemInput);
+            });
+
+            // 削除ボタン
+            itemElement.querySelector('.delete-item-button').addEventListener('click', () => {
+                deleteItem(index);
+            });
+
+            // レート取得ボタン
+            itemElement.querySelector('.fetch-rate-multi-item-button').addEventListener('click', () => {
+                const rateInput = itemElement.querySelector('.item-input-exchange-rate-jpy-usd');
+                const loadingMsg = itemElement.querySelector('.loading-message-multi');
+                const errorMsg = itemElement.querySelector('.error-message-multi');
+                
+                // 特定の商品のデータを更新してから計算をトリガーするコールバック
+                const callback = () => {
+                    // findではなく、直接itemElementのデータセットからindexを取得してmultiItemsDataを更新
+                    const currentItemIndex = parseInt(itemElement.dataset.itemIndex);
+                    const item = multiItemsData.find(d => d.id === currentItemIndex); // IDで検索
+                    if (item) {
+                        item.exchangeRateJpyUsd = rateInput.value; // 取得したレートをデータに反映
+                        item.metrics = calculateItemMetrics(item); // 再計算
+                        renderMultiItemResultsTable(multiItemResultsTable); // 結果テーブル更新
+                        if (!fullscreenTableView.classList.contains('hidden')) { // 全画面表示も更新
+                            renderMultiItemResultsTable(fullscreenTableContainer);
+                        }
+                    }
+                };
+                fetchExchangeRate(rateInput, loadingMsg, errorMsg, callback);
+            });
+
+            // eBay参照ボタン
+            itemElement.querySelector('.ebay-reference-multi-item-button').addEventListener('click', () => {
+                const currentItemIndex = parseInt(itemElement.dataset.itemIndex);
+                const item = multiItemsData.find(d => d.id === currentItemIndex); // IDで検索
+                if (!item) return;
+
+                const productName = item.productName.trim();
+                const productCondition = item.productCondition;
+                const productCategory = item.productCategory;
+
+                let searchQueryParts = [];
+                if (productCategory !== 'none' && productCategory.trim() !== '') {
+                    // productCategorySelectから表示テキストを取得
+                    const categoryOption = itemElement.querySelector(`.item-input-product-category option[value="${productCategory}"]`);
+                    if (categoryOption) searchQueryParts.push(categoryOption.textContent);
+                }
+                if (productName !== '') {
+                    searchQueryParts.push(productName);
+                }
+                if (productCondition !== 'none' && productCondition.trim() !== '') {
+                     // productConditionSelectから表示テキストを取得
+                    const conditionOption = itemElement.querySelector(`.item-input-product-condition option[value="${productCondition}"]`);
+                    if (conditionOption) searchQueryParts.push(conditionOption.textContent);
+                }
+
+                const searchQuery = searchQueryParts.join(' ');
+
+                if (searchQuery.trim() !== '') {
+                    const encodedSearchQuery = encodeURIComponent(searchQuery);
+                    const ebaySearchUrl = `https://www.ebay.com/sch/i.html?_nkw=${encodedSearchQuery}&LH_Complete=1&LH_Sold=1&_sop=3`;
+                    
+                    item.ebayReferenceUrl = ebaySearchUrl; // 商品ごとに参照URLを保存
+                    window.open(ebaySearchUrl, '_blank');
+                } else {
+                    alert('商品名を入力してください。'); // alertは最終的にカスタムモーダルに置き換える
+                }
+            });
+        }
+
+        /**
+         * 商品を削除する
+         * @param {number} idToRemove - 削除する商品の元のインデックス（表示上のID）
+         */
+        function deleteItem(idToRemove) {
+            multiItemsData = multiItemsData.filter(item => item.id !== idToRemove); // IDでフィルタリングして削除
+            // 削除後、残ったアイテムのIDと表示インデックスを再構築する
+            multiItemsData.forEach((item, newIndex) => {
+                item.id = newIndex; // IDを新しい表示順に合わせる
+            });
+            itemIndexCounter = multiItemsData.length; // カウンターも更新
+
+            renderMultiItemInputs(); // 入力フォームを再描画
+            renderMultiItemResultsTable(multiItemResultsTable); // 結果テーブルを更新
+            if (!fullscreenTableView.classList.contains('hidden')) { // 全画面表示も更新
+                renderMultiItemResultsTable(fullscreenTableContainer);
+            }
+        }
+
+        /**
+         * multiItemsDataに基づいて複数商品入力フォームを再描画する
+         */
+        function renderMultiItemInputs() {
+            multiItemInputsContainer.innerHTML = ''; // 一度クリア
+            multiItemsData.forEach((item, index) => {
+                // ここではitem.idが既に更新されていることを前提とする
+                multiItemInputsContainer.insertAdjacentHTML('beforeend', createMultiItemInputHtml(item.id, item));
+                const newItemElement = multiItemInputsContainer.lastElementChild;
+                attachMultiItemEventListeners(newItemElement, item.id); // attach時に更新されたIDを渡す
+            });
+        }
+
+
+        /**
+         * 複数商品の結果テーブルを生成し、指定されたコンテナに描画する
+         * @param {HTMLElement} targetElement - テーブルを描画するDOM要素
+         */
+        function renderMultiItemResultsTable(targetElement) {
+            let tableHtml = `
+                <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden text-sm md:text-base">
+                    <thead class="bg-gray-100 sticky-header">
+                        <tr>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tl-lg">No.</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">商品名</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">出品価格($)</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">為替レート</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">仕入価格(¥)</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">想定利益(¥)</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">利益率(%)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+            `;
+
+            if (multiItemsData.length === 0) {
+                tableHtml += `
+                    <tr>
+                        <td colspan="7" class="py-4 text-center text-gray-500">商品がありません。'+ 商品を追加'ボタンで追加してください。</td>
+                    </tr>
+                `;
+            } else {
+                multiItemsData.forEach((item, index) => {
+                    const metrics = item.metrics || {}; // 計算結果がない場合も考慮
+                    const productNameDisplay = item.productName && item.productName.trim() !== '' ? item.productName : '---';
+                    const listingPriceDisplay = item.listingPriceUsd && item.listingPriceUsd.trim() !== '' ? `$${parseFloat(item.listingPriceUsd).toFixed(2)}` : '---';
+                    const exchangeRateDisplay = item.exchangeRateJpyUsd && item.exchangeRateJpyUsd.trim() !== '' ? parseFloat(item.exchangeRateJpyUsd).toFixed(2) : '---';
+                    const costPriceDisplay = item.costPriceJpy && item.costPriceJpy.trim() !== '' ? parseFloat(item.costPriceJpy).toLocaleString('ja-JP') : '---';
+                    
+                    const profitDisplay = metrics.expectedProfitJpy ? metrics.expectedProfitJpy.toLocaleString('ja-JP') : '---';
+                    const profitMarginDisplay = metrics.profitMargin ? metrics.profitMargin.toFixed(2) : '---';
+                    const rowClass = metrics.error ? 'bg-red-50' : ''; // エラーがある行の背景色を変更
+
+                    tableHtml += `
+                        <tr class="${rowClass}">
+                            <td class="py-2 px-2 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
+                            <td class="py-2 px-2 whitespace-nowrap text-sm text-gray-700">${productNameDisplay}</td>
+                            <td class="py-2 px-2 whitespace-nowrap text-sm text-gray-700">${listingPriceDisplay}</td>
+                            <td class="py-2 px-2 whitespace-nowrap text-sm text-gray-700">${exchangeRateDisplay}</td>
+                            <td class="py-2 px-2 whitespace-nowrap text-sm text-gray-700">${costPriceDisplay}</td>
+                            <td class="py-2 px-2 whitespace-nowrap text-sm text-green-600 font-bold">${profitDisplay}</td>
+                            <td class="py-2 px-2 whitespace-nowrap text-sm text-blue-600 font-bold">${profitMarginDisplay} %</td>
+                        </tr>
+                    `;
+                    // エラーメッセージがあれば行の下に追加
+                    if (metrics.error) {
+                         tableHtml += `
+                            <tr class="${rowClass}">
+                                <td colspan="7" class="py-1 px-2 text-xs text-red-500 italic">${metrics.error}</td>
+                            </tr>
+                        `;
+                    }
+                });
+            }
+
+            tableHtml += `
+                    </tbody>
+                </table>
+            `;
+            targetElement.innerHTML = tableHtml;
+        }
+
+        /**
+         * 全ての商品の計算結果をまとめてシェアするメッセージを作成
+         * @returns {string} 全ての商品の計算結果をまとめた文字列
+         */
+        function createAllItemsShareMessage() {
+            let fullShareMessage = '';
+            multiItemsData.forEach((item, index) => {
+                const metrics = item.metrics || {};
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const timestamp = `${year}/${month}/${day} ${hours}:${minutes}`;
+
+                // 動的に生成されたフォームから直接テキストコンテンツを取得
+                const itemElement = multiItemInputsContainer.querySelector(`[data-item-index="${item.id}"]`); // IDで要素を検索
+                
+                let categoryText = '---';
+                let conditionText = '---';
+
+                if (itemElement) {
+                    const categorySelect = itemElement.querySelector('.item-input-product-category');
+                    if (categorySelect && categorySelect.value !== 'none') {
+                        categoryText = categorySelect.options[categorySelect.selectedIndex].textContent;
+                    }
+                    const conditionSelect = itemElement.querySelector('.item-input-product-condition');
+                    if (conditionSelect && conditionSelect.value !== 'none') {
+                        conditionText = conditionSelect.options[conditionSelect.selectedIndex].textContent;
+                    }
+                }
+                
+                const name = item.productName.trim() !== '' ? item.productName.trim() : '---';
+                
+                const listingPrice = item.listingPriceUsd.trim() !== '' ? `$${parseFloat(item.listingPriceUsd).toFixed(2)}` : '---';
+                const rate = item.exchangeRateJpyUsd.trim() !== '' ? parseFloat(item.exchangeRateJpyUsd).toFixed(2) : '---';
+                const cost = item.costPriceJpy.trim() !== '' ? parseFloat(item.costPriceJpy).toLocaleString('ja-JP') : '---';
+                const commission = item.commissionPercentage.trim() !== '' ? parseFloat(item.commissionPercentage).toFixed(1) : '---';
+                const shipping = item.shippingCostJpy.trim() !== '' ? parseFloat(item.shippingCostJpy).toLocaleString('ja-JP') : '---';
+                
+                const memo = item.memoText.trim() !== '' ? `\nメモ: ${item.memoText.trim()}\n` : '';
+                
+                let ebayLink = '';
+                if (item.ebayReferenceUrl && item.ebayReferenceUrl !== '') {
+                    const productNameForLink = item.productName.trim() !== '' ? item.productName.trim() : `商品${index + 1}`;
+                    ebayLink = `\neBay参照リンク: [${productNameForLink}_ebay sold item](${item.ebayReferenceUrl})\n`;
+                }
+
+                const profit = metrics.expectedProfitJpy ? metrics.expectedProfitJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' }) : '--- 円';
+                const profitMargin = metrics.profitMargin ? metrics.profitMargin.toFixed(2) : '---';
+                const breakeven = metrics.breakevenPointUsd ? metrics.breakevenPointUsd.toFixed(2) : '---';
+                const refund = metrics.consumptionTaxRefundJpy ? metrics.consumptionTaxRefundJpy.toLocaleString('ja-JP', { style: 'currency', currency: 'JPY' }) : '--- 円';
+
+
+                fullShareMessage += `--- 商品 ${index + 1} ---\n`;
+                fullShareMessage += `[${timestamp}]\n【eBay利益計算結果】\n\nカテゴリ: ${categoryText}\n商品名: ${name}\nコンディション: ${conditionText}\n\n出品価格: ${listingPrice}\n為替レート: ${rate} 円/ドル\n仕入価格: ${cost} 円\n手数料: ${commission} %\n送料: ${shipping} 円\n\n想定利益: ${profit}\n利益率: ${profitMargin} %\n損益分岐点: $${breakeven}\n消費税還付金: ${refund}${memo}${ebayLink}\n`;
+            });
+            return fullShareMessage;
+        }
+
+        /**
+         * CSVファイルを生成してダウンロードする
+         */
+        function exportToCsv() {
+            if (multiItemsData.length === 0) {
+                alert('エクスポートする商品データがありません。');
+                return;
+            }
+
+            const headers = [
+                'No.', '商品名', 'カテゴリ', 'コンディション', '出品価格($)', '為替レート(円/ドル)', 
+                '仕入価格(円)', '手数料(%)', '送料(円)', 'メモ', '想定利益(円)', '利益率(%)', 
+                '損益分岐点($)', '消費税還付金(円)', 'eBay参照リンク'
+            ];
+            let csvContent = headers.map(header => `"${header}"`).join(',') + '\n'; // ヘッダー行
+
+            multiItemsData.forEach((item, index) => {
+                const metrics = item.metrics || {};
+
+                // カテゴリとコンディションの表示テキストを取得
+                const itemElement = multiItemInputsContainer.querySelector(`[data-item-index="${item.id}"]`);
+                let categoryText = '---';
+                let conditionText = '---';
+                if (itemElement) {
+                    const categorySelect = itemElement.querySelector('.item-input-product-category');
+                    if (categorySelect && categorySelect.value !== 'none') {
+                        categoryText = categorySelect.options[categorySelect.selectedIndex].textContent;
+                    }
+                    const conditionSelect = itemElement.querySelector('.item-input-product-condition');
+                    if (conditionSelect && conditionSelect.value !== 'none') {
+                        conditionText = conditionSelect.options[conditionSelect.selectedIndex].textContent;
+                    }
+                }
+
+                const rowData = [
+                    index + 1,
+                    item.productName || '',
+                    categoryText,
+                    conditionText,
+                    item.listingPriceUsd || '',
+                    item.exchangeRateJpyUsd || '',
+                    item.costPriceJpy || '',
+                    item.commissionPercentage || '',
+                    item.shippingCostJpy || '',
+                    item.memoText || '',
+                    metrics.expectedProfitJpy ? metrics.expectedProfitJpy.toFixed(2) : '',
+                    metrics.profitMargin ? metrics.profitMargin.toFixed(2) : '',
+                    metrics.breakevenPointUsd ? metrics.breakevenPointUsd.toFixed(2) : '',
+                    metrics.consumptionTaxRefundJpy ? metrics.consumptionTaxRefundJpy.toFixed(2) : '',
+                    item.ebayReferenceUrl || ''
+                ];
+
+                // CSV形式に変換（カンマとダブルクォーテーションのエスケープ）
+                csvContent += rowData.map(field => {
+                    const stringField = String(field);
+                    // ダブルクォーテーションが含まれていたら二重にする
+                    const escapedField = stringField.replace(/"/g, '""');
+                    // カンマ、改行、またはダブルクォーテーションが含まれていたらダブルクォーテーションで囲む
+                    if (escapedField.includes(',') || escapedField.includes('\n') || escapedField.includes('"')) {
+                        return `"${escapedField}"`;
+                    }
+                    return escapedField;
+                }).join(',') + '\n';
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+
+            const now = new Date();
+            const filename = `ebay_profit_calculation_multi_items_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.csv`;
+            a.download = filename;
+
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url); // オブジェクトURLを解放
+        }
+
+
+        // --- イベントリスナー (複数商品ビュー) ---
+
+        // 商品追加ボタン
+        addItemButton.addEventListener('click', addItem);
+
+        // 全ての計算結果をシェアボタン
+        shareAllItemsButton.addEventListener('click', async () => {
+            if (navigator.share) {
+                const shareData = {
+                    title: '全てのeBay利益計算結果',
+                    text: createAllItemsShareMessage(),
+                };
+
+                try {
+                    await navigator.share(shareData);
+                    console.log('全てのコンテンツが正常に共有されました');
+                } catch (error) {
+                    console.error('コンテンツの共有中にエラーが発生しました:', error);
+                }
+            } else {
+                alert('お使いのブラウザはシェア機能に対応していません。'); // カスタムモーダルに置き換える
+            }
+        });
+
+        // CSVエクスポートボタン
+        exportCsvButton.addEventListener('click', exportToCsv);
+
+        // 全画面表示ボタン
+        viewFullscreenButton.addEventListener('click', () => {
+            fullscreenTableView.classList.remove('hidden');
+            renderMultiItemResultsTable(fullscreenTableContainer); // 全画面用のコンテナにテーブルを描画
+        });
+
+        // 全画面表示を閉じるボタン
+        closeFullscreenButton.addEventListener('click', () => {
+            fullscreenTableView.classList.add('hidden');
+            // 必要であれば、元のmultiItemResultsTableも再描画して最新の状態に保つ
+            renderMultiItemResultsTable(multiItemResultsTable);
+        });
+
+        // --- 初期化処理 ---
         document.addEventListener('DOMContentLoaded', () => {
-            fetchRateButton.click(); 
-            performCalculation(); 
+            // 単一商品ビューの初期化
+            fetchExchangeRate(exchangeRateJpyUsdInput, loadingMessageDiv, rateErrorMessageDiv, performSingleItemCalculation);
+            // 初期表示を全て「---」にする
+            resultCategoryDiv.textContent = 'カテゴリ: ---';
+            resultNameDiv.textContent = '商品名: ---';
+            resultConditionDiv.textContent = 'コンディション: ---';
+            expectedProfitResultDiv.textContent = '--- 円';
+            profitMarginResultDiv.textContent = '--- %';
+            breakevenPointResultDiv.textContent = '--- ドル';
+            consumptionTaxRefundResultDiv.textContent = '--- 円';
+            errorMessageDiv.classList.add('hidden'); // エラーメッセージは初期表示しない
         });
     </script>
 </body>
