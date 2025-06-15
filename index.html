@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eBay利益計算アプリ</title>
+    <!-- Tailwind CSS CDNを読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Google Fonts 'Inter' を読み込み */
@@ -13,11 +14,11 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* カメラ入力要素を非表示にする (複数商品モード用は残す)*/
+        /* カメラ入力要素を非表示にする (共通クラスとして保持)*/
         .camera-input {
             display: none;
         }
-        /* 画像プレビューのスタイル (複数商品モード用は残す)*/
+        /* 画像プレビューのスタイル (共通クラスとして保持)*/
         .image-preview {
             border: 1px solid #e0e0e0; /* 軽い枠線 */
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 軽い影 */
@@ -42,16 +43,19 @@
             overflow-y: auto; /* テーブルが縦に長い場合にスクロール可能にする */
         }
     </style>
+    <!-- スマートフォンショートカットアイコンの指定 -->
     <link rel="apple-touch-icon" href="S__63234053.jpg">
     <link rel="icon" href="S__63234053.jpg">
 </head>
 
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
+    <!-- Single Item View -->
     <div id="singleItemView" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-auto text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 rounded-lg text-center">
             Zero One<br>eBay利益計算アプリ
         </h1>
 
+        <!-- 商品名 -->
         <div class="mb-5 text-left">
             <label for="productName" class="block text-gray-700 text-sm font-semibold mb-2">
                 商品名 (任意)
@@ -61,6 +65,7 @@
                    aria-label="商品名を入力">
         </div>
 
+        <!-- 商品カテゴリ -->
         <div class="mb-5 text-left">
             <label for="productCategory" class="block text-gray-700 text-sm font-semibold mb-2">
                 商品カテゴリ (任意)
@@ -78,6 +83,7 @@
             </select>
         </div>
 
+        <!-- コンディション入力欄とeBay参照ボタン -->
         <div class="mb-5 text-left">
             <label for="productCondition" class="block text-gray-700 text-sm font-semibold mb-2">
                 コンディション (任意)
@@ -103,6 +109,7 @@
         </div>
 
 
+        <!-- 出品価格 ($) -->
         <div class="mb-5 text-left">
             <label for="listingPriceUsd" class="block text-gray-700 text-sm font-semibold mb-2">
                 出品価格 ($)
@@ -112,6 +119,7 @@
                    aria-label="出品価格をドルで入力">
         </div>
 
+        <!-- 為替レート (円/ドル) -->
         <div class="mb-5 text-left">
             <label for="exchangeRateJpyUsd" class="block text-gray-700 text-sm font-semibold mb-2">
                 為替レート (円/ドル)
@@ -133,6 +141,7 @@
             </p>
         </div>
 
+        <!-- 仕入価格 (円) -->
         <div class="mb-5 text-left">
             <label for="costPriceJpy" class="block text-gray-700 text-sm font-semibold mb-2">
                 仕入価格 (円) <span class="font-normal text-gray-500">(税込額を入力)</span>
@@ -142,6 +151,7 @@
                    aria-label="仕入価格を日本円で入力">
         </div>
 
+        <!-- 手数料 (%) -->
         <div class="mb-5 text-left">
             <label for="commissionPercentage" class="block text-gray-700 text-sm font-semibold mb-2">
                 手数料 (%)
@@ -151,6 +161,7 @@
                    aria-label="手数料をパーセンテージで入力">
         </div>
 
+        <!-- 送料 (円) -->
         <div class="mb-5 text-left">
             <label for="shippingCostJpy" class="block text-gray-700 text-sm font-semibold mb-2">
                 送料 (円) <span class="font-normal text-gray-500">(Free Shipping設定時など、出品者が負担する送料)</span>
@@ -160,6 +171,7 @@
                    aria-label="送料を日本円で入力">
         </div>
         
+        <!-- メモ欄 -->
         <div class="mb-6 text-left">
             <label for="memoText" class="block text-gray-700 text-sm font-semibold mb-2">
                 メモ (任意)
@@ -170,15 +182,18 @@
         </div>
 
 
+        <!-- 計算ボタン -->
         <button id="calculateButton"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             計算
         </button>
 
+        <!-- 計算結果表示エリア -->
         <div class="mt-8 text-left">
             <h2 class="text-xl font-semibold text-gray-700 mb-4">
                 計算結果
             </h2>
+            <!-- 商品カテゴリと商品名を結果欄に表示 -->
             <div id="productInfoResult" class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">商品情報</p>
                 <div class="text-lg font-bold text-gray-800 break-all min-h-[32px] flex flex-col items-start justify-center">
@@ -188,6 +203,7 @@
                 </div>
             </div>
 
+            <!-- 想定利益 -->
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">想定利益</p>
                 <div id="expectedProfitResult"
@@ -196,6 +212,7 @@
                 </div>
             </div>
 
+            <!-- 利益率 -->
             <div class="bg-gray-100 p-2 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">利益率</p>
                 <div id="profitMarginResult"
@@ -204,6 +221,7 @@
                 </div>
             </div>
 
+            <!-- 損益分岐点 -->
             <div class="bg-gray-100 p-2 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">損益分岐点</p>
                 <div id="breakevenPointResult"
@@ -212,6 +230,7 @@
                 </div>
             </div>
 
+            <!-- 消費税還付金 -->
             <div class="bg-gray-100 p-2 rounded-lg">
                 <p class="text-gray-600 text-sm font-semibold mb-1">消費税還付金</p>
                 <div id="consumptionTaxRefundResult"
@@ -220,9 +239,37 @@
                 </div>
             </div>
             <p id="errorMessage" class="text-red-500 mt-4 text-sm hidden">
-                </p>
+                <!-- エラーメッセージはJavaScriptで動的に挿入されます -->
+            </p>
         </div>
 
+        <!-- カメラ起動と画像メモ (再追加) -->
+        <div class="mt-4 text-center">
+            <input type="file" accept="image/*" capture="camera" id="cameraInput" class="camera-input">
+            <button id="cameraButton"
+                    class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                カメラ起動 (撮影メモ)
+            </button>
+            <p class="text-gray-500 text-sm mt-2">
+                ※撮影した画像をシェアできます。スマホ本体への直接保存は出来ません。
+            </p>
+            <div id="imagePreviewContainer" class="mt-4 hidden">
+                <p class="text-gray-700 text-sm font-semibold mb-2">撮影画像プレビュー:</p>
+                <img id="imagePreview" class="max-w-full h-auto rounded-lg shadow-md mx-auto image-preview" alt="撮影画像プレビュー">
+                <div class="flex justify-center space-x-4 mt-4">
+                    <button id="downloadImageButton"
+                            class="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 text-sm">
+                        画像をダウンロード
+                    </button>
+                    <button id="shareImageOnlyButton"
+                            class="flex-1 bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 text-sm">
+                        画像をシェア
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- シェアボタン -->
         <div class="mt-8 flex justify-center">
             <button id="shareButton"
                     class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
@@ -230,11 +277,13 @@
             </button>
         </div>
 
+        <!-- 複数商品モードへの切り替えボタン -->
         <button id="toggleMultiViewButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 mt-8">
             複数商品モード
         </button>
     </div>
 
+    <!-- Multi Item View (最初は非表示) -->
     <div id="multiItemView" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl mx-auto text-center hidden">
         <button id="toggleSingleViewButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 mb-8">
             単一商品モードに戻る
@@ -243,7 +292,8 @@
         <h2 class="text-2xl font-bold text-gray-800 mb-6">複数商品入力</h2>
 
         <div id="multiItemInputsContainer">
-            </div>
+            <!-- 動的に追加される商品入力フォームがここに入る -->
+        </div>
 
         <button id="addItemButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 mt-6">
             + 商品を追加
@@ -252,12 +302,14 @@
         <h2 class="text-xl font-semibold text-gray-700 mt-8 mb-4">
             複数商品計算結果一覧
         </h2>
+        <!-- 全画面表示ボタンを追加 -->
         <button id="viewFullscreenButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mb-4">
             全画面表示
         </button>
         
         <div id="multiItemResultsTable" class="overflow-x-auto">
-            </div>
+            <!-- 複数商品の結果テーブルがここに生成される -->
+        </div>
 
         <div class="mt-8 flex justify-center space-x-4">
             <button id="shareAllItemsButton" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2">
@@ -269,6 +321,7 @@
         </div>
     </div>
 
+    <!-- Fullscreen Table View (最初は非表示) -->
     <div id="fullscreenTableView" class="hidden">
         <div class="flex justify-between items-center bg-gray-100 p-4 rounded-b-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800">複数商品計算結果一覧 (全画面)</h2>
@@ -277,7 +330,8 @@
             </button>
         </div>
         <div id="fullscreenTableContainer" class="p-4">
-            </div>
+            <!-- 全画面表示用のテーブルがここに生成される -->
+        </div>
     </div>
 
     <script>
@@ -297,7 +351,14 @@
         const fetchRateButton = document.getElementById('fetchRateButton');
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButton = document.getElementById('shareButton'); 
-        // 単一商品モードのカメラ関連要素は削除されました
+        
+        // Single Item View のカメラ関連要素 (再追加)
+        const cameraInput = document.getElementById('cameraInput'); 
+        const cameraButton = document.getElementById('cameraButton'); 
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
+        const imagePreview = document.getElementById('imagePreview'); 
+        const downloadImageButton = document.getElementById('downloadImageButton'); 
+        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton');
 
         const resultCategoryDiv = document.getElementById('resultCategory');
         const resultNameDiv = document.getElementById('resultName');
@@ -341,7 +402,7 @@
         let itemUniqueIdCounter = 0; // 各商品のユニークなIDを生成するためのカウンター
 
         // 為替レートAPIキー
-        const apiKey = "1372dbb55066a8afb68619d2"; // 新しいAPIキーに変更しました
+        const apiKey = "1372dbb55066a8afb68619d2"; 
 
         // --- 関数定義 ---
 
@@ -494,8 +555,8 @@
             const listingPrice = itemData.listingPriceUsd.trim() !== '' ? `$${parseFloat(itemData.listingPriceUsd).toFixed(2)}` : '---';
             const rate = itemData.exchangeRateJpyUsd.trim() !== '' ? parseFloat(itemData.exchangeRateJpyUsd).toFixed(2) : '---';
             const cost = itemData.costPriceJpy.trim() !== '' ? parseFloat(itemData.costPriceJpy).toLocaleString('ja-JP') : '---';
-            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(item.commissionPercentage).toFixed(1) : '---';
-            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(item.shippingCostJpy).toLocaleString('ja-JP') : '---';
+            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(itemData.commissionPercentage).toFixed(1) : '---';
+            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(itemData.shippingCostJpy).toLocaleString('ja-JP') : '---';
             
             const memo = itemData.memoText.trim() !== '' ? `\nメモ: ${itemData.memoText.trim()}\n` : '';
             
@@ -536,7 +597,11 @@
                     }, calculatedResults),
                 };
 
-                // 単一商品モードでは画像添付機能は削除されました。
+                // 撮影した画像があればfilesに含める (単一商品用)
+                if (cameraInput.files && cameraInput.files.length > 0) {
+                    const imageFile = cameraInput.files[0];
+                    shareData.files = [imageFile];
+                }
 
                 try {
                     await navigator.share(shareData);
@@ -583,7 +648,66 @@
             }
         });
 
-        // 単一商品モードのカメラ関連ボタンと入力のイベントリスナーは削除されました
+        // カメラ起動ボタンのイベントリスナー (単一商品用 - 再追加)
+        cameraButton.addEventListener('click', () => {
+            cameraInput.click(); 
+        });
+
+        // カメラで撮影した画像が選択された時の処理 (単一商品用 - 再追加)
+        cameraInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.classList.remove('hidden'); 
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreview.src = '';
+                imagePreviewContainer.classList.add('hidden'); 
+            }
+        });
+
+        // 画像ダウンロードボタンのイベントリスナー (単一商品用 - 再追加)
+        downloadImageButton.addEventListener('click', () => {
+            const imageUrl = imagePreview.src;
+            if (imageUrl && imageUrl !== '') {
+                const a = document.createElement('a');
+                a.href = imageUrl;
+                const now = new Date();
+                const filename = `ebay_photo_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.png`;
+                a.download = filename; 
+                document.body.appendChild(a); 
+                a.click(); 
+                document.body.removeChild(a); 
+            } else {
+                errorMessageDiv.textContent = 'ダウンロードする画像がありません。';
+                errorMessageDiv.classList.remove('hidden');
+                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
+            }
+        });
+
+        // 画像のみシェアボタンのイベントリスナー (単一商品用 - 再追加)
+        shareImageOnlyButton.addEventListener('click', async () => {
+            if (navigator.share && cameraInput.files && cameraInput.files.length > 0) {
+                const imageFile = cameraInput.files[0];
+                try {
+                    await navigator.share({
+                        files: [imageFile],
+                        title: 'eBay利益計算アプリで撮影した画像', 
+                        text: '参考画像' 
+                    });
+                    console.log('画像が正常に共有されました');
+                } catch (error) {
+                    console.error('画像の共有中にエラーが発生しました:', error);
+                }
+            } else {
+                errorMessageDiv.textContent = '共有する画像がありません。または、お使いのブラウザは画像シェア機能に対応していません。（HTTPS環境が必要です）';
+                errorMessageDiv.classList.remove('hidden');
+                setTimeout(() => errorMessageDiv.classList.add('hidden'), 5000);
+            }
+        });
 
         // 計算ボタンがクリックされた時の処理 (単一商品ビュー)
         calculateButton.addEventListener('click', performSingleItemCalculation);
@@ -694,6 +818,7 @@
                         <textarea class="w-full p-2 border border-gray-300 rounded-lg item-input-memo-text" rows="2">${itemData.memoText || ''}</textarea>
                     </div>
 
+                    <!-- 画像関連の要素を追加 -->
                     <div class="mt-4 text-center">
                         <input type="file" accept="image/*" capture="camera" class="camera-input" id="cameraInput-${uniqueId}">
                         <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm item-camera-button">
