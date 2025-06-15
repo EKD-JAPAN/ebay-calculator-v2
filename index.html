@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eBay利益計算アプリ</title>
-    <!-- Tailwind CSS CDNを読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         /* Google Fonts 'Inter' を読み込み */
@@ -43,16 +42,16 @@
             overflow-y: auto; /* テーブルが縦に長い場合にスクロール可能にする */
         }
     </style>
+    <link rel="apple-touch-icon" href="S__63234053.jpg">
+    <link rel="icon" href="S__63234053.jpg">
 </head>
 
 <body class="bg-gradient-to-br from-blue-500 to-purple-600 min-h-screen flex items-center justify-center p-4">
-    <!-- Single Item View (既存のコンテンツ) -->
     <div id="singleItemView" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-auto text-center">
         <h1 class="text-3xl font-bold text-gray-800 mb-6 rounded-lg text-center">
             Zero One<br>eBay利益計算アプリ
         </h1>
 
-        <!-- 商品名 -->
         <div class="mb-5 text-left">
             <label for="productName" class="block text-gray-700 text-sm font-semibold mb-2">
                 商品名 (任意)
@@ -62,7 +61,6 @@
                    aria-label="商品名を入力">
         </div>
 
-        <!-- 商品カテゴリ -->
         <div class="mb-5 text-left">
             <label for="productCategory" class="block text-gray-700 text-sm font-semibold mb-2">
                 商品カテゴリ (任意)
@@ -80,7 +78,6 @@
             </select>
         </div>
 
-        <!-- コンディション入力欄とeBay参照ボタン -->
         <div class="mb-5 text-left">
             <label for="productCondition" class="block text-gray-700 text-sm font-semibold mb-2">
                 コンディション (任意)
@@ -106,7 +103,6 @@
         </div>
 
 
-        <!-- 出品価格 ($) -->
         <div class="mb-5 text-left">
             <label for="listingPriceUsd" class="block text-gray-700 text-sm font-semibold mb-2">
                 出品価格 ($)
@@ -116,7 +112,6 @@
                    aria-label="出品価格をドルで入力">
         </div>
 
-        <!-- 為替レート (円/ドル) -->
         <div class="mb-5 text-left">
             <label for="exchangeRateJpyUsd" class="block text-gray-700 text-sm font-semibold mb-2">
                 為替レート (円/ドル)
@@ -138,7 +133,6 @@
             </p>
         </div>
 
-        <!-- 仕入価格 (円) -->
         <div class="mb-5 text-left">
             <label for="costPriceJpy" class="block text-gray-700 text-sm font-semibold mb-2">
                 仕入価格 (円) <span class="font-normal text-gray-500">(税込額を入力)</span>
@@ -148,7 +142,6 @@
                    aria-label="仕入価格を日本円で入力">
         </div>
 
-        <!-- 手数料 (%) -->
         <div class="mb-5 text-left">
             <label for="commissionPercentage" class="block text-gray-700 text-sm font-semibold mb-2">
                 手数料 (%)
@@ -158,7 +151,6 @@
                    aria-label="手数料をパーセンテージで入力">
         </div>
 
-        <!-- 送料 (円) -->
         <div class="mb-5 text-left">
             <label for="shippingCostJpy" class="block text-gray-700 text-sm font-semibold mb-2">
                 送料 (円) <span class="font-normal text-gray-500">(Free Shipping設定時など、出品者が負担する送料)</span>
@@ -168,7 +160,6 @@
                    aria-label="送料を日本円で入力">
         </div>
         
-        <!-- メモ欄 -->
         <div class="mb-6 text-left">
             <label for="memoText" class="block text-gray-700 text-sm font-semibold mb-2">
                 メモ (任意)
@@ -179,18 +170,15 @@
         </div>
 
 
-        <!-- 計算ボタン -->
         <button id="calculateButton"
                 class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             計算
         </button>
 
-        <!-- 計算結果表示エリア -->
         <div class="mt-8 text-left">
             <h2 class="text-xl font-semibold text-gray-700 mb-4">
                 計算結果
             </h2>
-            <!-- 商品カテゴリと商品名を結果欄に表示 -->
             <div id="productInfoResult" class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">商品情報</p>
                 <div class="text-lg font-bold text-gray-800 break-all min-h-[32px] flex flex-col items-start justify-center">
@@ -200,7 +188,6 @@
                 </div>
             </div>
 
-            <!-- 想定利益 -->
             <div class="bg-gray-100 p-4 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">想定利益</p>
                 <div id="expectedProfitResult"
@@ -209,7 +196,6 @@
                 </div>
             </div>
 
-            <!-- 利益率 -->
             <div class="bg-gray-100 p-2 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">利益率</p>
                 <div id="profitMarginResult"
@@ -218,7 +204,6 @@
                 </div>
             </div>
 
-            <!-- 損益分岐点 -->
             <div class="bg-gray-100 p-2 rounded-lg mb-3">
                 <p class="text-gray-600 text-sm font-semibold mb-1">損益分岐点</p>
                 <div id="breakevenPointResult"
@@ -227,7 +212,6 @@
                 </div>
             </div>
 
-            <!-- 消費税還付金 -->
             <div class="bg-gray-100 p-2 rounded-lg">
                 <p class="text-gray-600 text-sm font-semibold mb-1">消費税還付金</p>
                 <div id="consumptionTaxRefundResult"
@@ -236,11 +220,9 @@
                 </div>
             </div>
             <p id="errorMessage" class="text-red-500 mt-4 text-sm hidden">
-                <!-- エラーメッセージはJavaScriptで動的に挿入されます -->
-            </p>
+                </p>
         </div>
 
-        <!-- シェアボタン -->
         <div class="mt-8 flex justify-center">
             <button id="shareButton"
                     class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
@@ -248,13 +230,11 @@
             </button>
         </div>
 
-        <!-- 複数商品モードへの切り替えボタン -->
         <button id="toggleMultiViewButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 mt-8">
             複数商品モード
         </button>
     </div>
 
-    <!-- Multi Item View (最初は非表示) -->
     <div id="multiItemView" class="bg-white p-8 rounded-xl shadow-2xl w-full max-w-2xl mx-auto text-center hidden">
         <button id="toggleSingleViewButton" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 mb-8">
             単一商品モードに戻る
@@ -263,8 +243,7 @@
         <h2 class="text-2xl font-bold text-gray-800 mb-6">複数商品入力</h2>
 
         <div id="multiItemInputsContainer">
-            <!-- 動的に追加される商品入力フォームがここに入る -->
-        </div>
+            </div>
 
         <button id="addItemButton" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 mt-6">
             + 商品を追加
@@ -273,14 +252,12 @@
         <h2 class="text-xl font-semibold text-gray-700 mt-8 mb-4">
             複数商品計算結果一覧
         </h2>
-        <!-- 全画面表示ボタンを追加 -->
         <button id="viewFullscreenButton" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 mb-4">
             全画面表示
         </button>
         
         <div id="multiItemResultsTable" class="overflow-x-auto">
-            <!-- 複数商品の結果テーブルがここに生成される -->
-        </div>
+            </div>
 
         <div class="mt-8 flex justify-center space-x-4">
             <button id="shareAllItemsButton" class="flex-1 bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-offset-2">
@@ -292,7 +269,6 @@
         </div>
     </div>
 
-    <!-- Fullscreen Table View (最初は非表示) -->
     <div id="fullscreenTableView" class="hidden">
         <div class="flex justify-between items-center bg-gray-100 p-4 rounded-b-lg shadow-md">
             <h2 class="text-2xl font-bold text-gray-800">複数商品計算結果一覧 (全画面)</h2>
@@ -301,8 +277,7 @@
             </button>
         </div>
         <div id="fullscreenTableContainer" class="p-4">
-            <!-- 全画面表示用のテーブルがここに生成される -->
-        </div>
+            </div>
     </div>
 
     <script>
@@ -366,7 +341,7 @@
         let itemUniqueIdCounter = 0; // 各商品のユニークなIDを生成するためのカウンター
 
         // 為替レートAPIキー
-        const apiKey = "1372dbb55066a8afb68619d3"; 
+        const apiKey = "1372dbb55066a8afb68619d2"; // 新しいAPIキーに変更しました
 
         // --- 関数定義 ---
 
@@ -519,8 +494,8 @@
             const listingPrice = itemData.listingPriceUsd.trim() !== '' ? `$${parseFloat(itemData.listingPriceUsd).toFixed(2)}` : '---';
             const rate = itemData.exchangeRateJpyUsd.trim() !== '' ? parseFloat(itemData.exchangeRateJpyUsd).toFixed(2) : '---';
             const cost = itemData.costPriceJpy.trim() !== '' ? parseFloat(itemData.costPriceJpy).toLocaleString('ja-JP') : '---';
-            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(itemData.commissionPercentage).toFixed(1) : '---';
-            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(itemData.shippingCostJpy).toLocaleString('ja-JP') : '---';
+            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(item.commissionPercentage).toFixed(1) : '---';
+            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(item.shippingCostJpy).toLocaleString('ja-JP') : '---';
             
             const memo = itemData.memoText.trim() !== '' ? `\nメモ: ${itemData.memoText.trim()}\n` : '';
             
@@ -683,7 +658,6 @@
                         </select>
                     </div>
 
-                    <!-- eBay参照ボタンをここに追加 -->
                     <div class="mb-3 text-right">
                         <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-xs whitespace-nowrap ebay-reference-multi-item-button">
                             eBay参照
@@ -720,7 +694,6 @@
                         <textarea class="w-full p-2 border border-gray-300 rounded-lg item-input-memo-text" rows="2">${itemData.memoText || ''}</textarea>
                     </div>
 
-                    <!-- 画像関連の要素を追加 -->
                     <div class="mt-4 text-center">
                         <input type="file" accept="image/*" capture="camera" class="camera-input" id="cameraInput-${uniqueId}">
                         <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm item-camera-button">
@@ -1172,8 +1145,15 @@
             const a = document.createElement('a');
             a.href = url;
 
+            // ファイル名に当日の日時＋zero_one_research を付与
             const now = new Date();
-            const filename = `ebay_profit_calculation_multi_items_${now.getFullYear()}${(now.getMonth() + 1).toString().padStart(2, '0')}${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}${now.getMinutes().toString().padStart(2, '0')}${now.getSeconds().toString().padStart(2, '0')}.csv`;
+            const year = now.getFullYear();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const filename = `${year}${month}${day}_${hours}${minutes}${seconds}_zero_one_research.csv`;
             a.download = filename;
 
             document.body.appendChild(a);
