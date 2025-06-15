@@ -352,7 +352,7 @@
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButton = document.getElementById('shareButton'); 
         
-        // Single Item View のカメラ関連要素 (再追加)
+        // Single Item View のカメラ関連要素
         const cameraInput = document.getElementById('cameraInput'); 
         const cameraButton = document.getElementById('cameraButton'); 
         const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
@@ -402,7 +402,9 @@
         let itemUniqueIdCounter = 0; // 各商品のユニークなIDを生成するためのカウンター
 
         // 為替レートAPIキー
-        const apiKey = "1372dbb55066a8afb68619d2"; 
+        // ExchangeRate-APIは無料で利用可能ですが、有料プランなどでAPIキーが必要になる場合があります。
+        // APIキーが必要な場合は、https://www.exchangerate-api.com/ で取得して設定してください。
+        const apiKey = ""; 
 
         // --- 関数定義 ---
 
@@ -507,7 +509,9 @@
             rateInput.disabled = true; // 入力欄を一時的に無効化
 
             try {
-                const apiUrl = `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD`; 
+                // ExchangeRate-APIのエンドポイントを使用
+                // APIキーが設定されている場合はそれを使用し、なければ無料プランのデフォルトエンドポイントを使用
+                const apiUrl = apiKey ? `https://v6.exchangerate-api.com/v6/${apiKey}/latest/USD` : `https://v6.exchangerate-api.com/v6/latest/USD`;
                 const response = await fetch(apiUrl);
                 const data = await response.json();
 
@@ -518,12 +522,25 @@
                         callback(); // レート取得後にコールバックを実行
                     }
                 } else {
-                    errorMsg.textContent = 'レートの取得に失敗しました。APIエラーまたはデータ形式が不正です。';
+                    let specificError = '不明なエラーです。';
+                    if (data.result === 'error' && data['error-type']) {
+                        specificError = `APIエラー: ${data['error-type']}`;
+                        if (data['error-type'] === 'invalid-key') {
+                            specificError += ' - APIキーが不正または無効です。';
+                        } else if (data['error-type'] === 'usage-limit-reached') {
+                            specificError += ' - API利用制限に達しました。';
+                        } else if (data['error-type'] === 'unsupported-code') {
+                            specificError += ' - サポートされていない通貨コードです。';
+                        }
+                    } else if (!response.ok) {
+                        specificError = `HTTPエラー: ${response.status} ${response.statusText}`;
+                    }
+                    errorMsg.textContent = `レートの取得に失敗しました: ${specificError}。手動で入力してください。`;
                     errorMsg.classList.remove('hidden');
                 }
             } catch (error) {
                 console.error('為替レートの取得中にエラーが発生しました:', error);
-                errorMsg.textContent = 'レートの取得中にネットワークエラーが発生しました。';
+                errorMsg.textContent = `レートの取得中にネットワークエラーが発生しました: ${error.message}。インターネット接続を確認し、再度お試しください。`;
                 errorMsg.classList.remove('hidden');
             } finally {
                 loadingMsg.classList.add('hidden');
@@ -648,12 +665,12 @@
             }
         });
 
-        // カメラ起動ボタンのイベントリスナー (単一商品用 - 再追加)
+        // カメラ起動ボタンのイベントリスナー (単一商品用)
         cameraButton.addEventListener('click', () => {
             cameraInput.click(); 
         });
 
-        // カメラで撮影した画像が選択された時の処理 (単一商品用 - 再追加)
+        // カメラで撮影した画像が選択された時の処理 (単一商品用)
         cameraInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -669,7 +686,7 @@
             }
         });
 
-        // 画像ダウンロードボタンのイベントリスナー (単一商品用 - 再追加)
+        // 画像ダウンロードボタンのイベントリスナー (単一商品用)
         downloadImageButton.addEventListener('click', () => {
             const imageUrl = imagePreview.src;
             if (imageUrl && imageUrl !== '') {
@@ -688,7 +705,7 @@
             }
         });
 
-        // 画像のみシェアボタンのイベントリスナー (単一商品用 - 再追加)
+        // 画像のみシェアボタンのイベントリスナー (単一商品用)
         shareImageOnlyButton.addEventListener('click', async () => {
             if (navigator.share && cameraInput.files && cameraInput.files.length > 0) {
                 const imageFile = cameraInput.files[0];
