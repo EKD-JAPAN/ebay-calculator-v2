@@ -15,15 +15,16 @@
             font-family: 'Inter', sans-serif;
         }
         /* カメラ入力要素を非表示にする */
-        #cameraInput {
+        .camera-input {
             display: none;
         }
         /* 画像プレビューのスタイル */
-        #imagePreview {
+        .image-preview {
             border: 1px solid #e0e0e0; /* 軽い枠線 */
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 軽い影 */
             object-fit: contain; /* 画像全体を表示し、アスペクト比を維持 */
-            max-height: 300px; /* プレビューの最大高さを設定 */
+            max-height: 200px; /* プレビューの最大高さを設定 */
+            margin-top: 0.5rem; /* 上部との余白 */
         }
         /* テーブルのヘッダーを固定する（必要に応じて） */
         .sticky-header th {
@@ -347,12 +348,12 @@
         const fetchRateButton = document.getElementById('fetchRateButton');
         const ebayReferenceButton = document.getElementById('ebayReferenceButton');
         const shareButton = document.getElementById('shareButton'); 
-        const cameraInput = document.getElementById('cameraInput'); 
-        const cameraButton = document.getElementById('cameraButton'); 
-        const imagePreviewContainer = document.getElementById('imagePreviewContainer'); 
-        const imagePreview = document.getElementById('imagePreview'); 
-        const downloadImageButton = document.getElementById('downloadImageButton'); 
-        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton');
+        const cameraInput = document.getElementById('cameraInput'); // 単一商品用
+        const cameraButton = document.getElementById('cameraButton'); // 単一商品用
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer'); // 単一商品用
+        const imagePreview = document.getElementById('imagePreview'); // 単一商品用
+        const downloadImageButton = document.getElementById('downloadImageButton'); // 単一商品用
+        const shareImageOnlyButton = document.getElementById('shareImageOnlyButton'); // 単一商品用
         const toggleMultiViewButton = document.getElementById('toggleMultiViewButton');
 
         const resultCategoryDiv = document.getElementById('resultCategory');
@@ -394,7 +395,7 @@
 
         // 複数商品データを保持する配列
         let multiItemsData = [];
-        let itemIndexCounter = 0; // 商品のユニークIDを生成するためのカウンター
+        let itemUniqueIdCounter = 0; // 各商品のユニークなIDを生成するためのカウンター
 
         // 為替レートAPIキー
         const apiKey = "1372dbb55066a8afb68619d3"; 
@@ -592,7 +593,7 @@
                     }, calculatedResults),
                 };
 
-                // 撮影した画像があればfilesに含める
+                // 撮影した画像があればfilesに含める (単一商品用)
                 if (cameraInput.files && cameraInput.files.length > 0) {
                     const imageFile = cameraInput.files[0];
                     shareData.files = [imageFile];
@@ -643,12 +644,12 @@
             }
         });
 
-        // カメラ起動ボタンのイベントリスナー
+        // カメラ起動ボタンのイベントリスナー (単一商品用)
         cameraButton.addEventListener('click', () => {
             cameraInput.click(); 
         });
 
-        // カメラで撮影した画像が選択された時の処理
+        // カメラで撮影した画像が選択された時の処理 (単一商品用)
         cameraInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -664,7 +665,7 @@
             }
         });
 
-        // 画像ダウンロードボタンのイベントリスナー
+        // 画像ダウンロードボタンのイベントリスナー (単一商品用)
         downloadImageButton.addEventListener('click', () => {
             const imageUrl = imagePreview.src;
             if (imageUrl && imageUrl !== '') {
@@ -683,7 +684,7 @@
             }
         });
 
-        // 画像のみシェアボタンのイベントリスナー
+        // 画像のみシェアボタンのイベントリスナー (単一商品用)
         shareImageOnlyButton.addEventListener('click', async () => {
             if (navigator.share && cameraInput.files && cameraInput.files.length > 0) {
                 const imageFile = cameraInput.files[0];
@@ -737,11 +738,12 @@
 
         /**
          * 新しい商品入力フォームのHTMLを生成する
-         * @param {number} itemIndex - 商品のインデックス
+         * @param {number} uniqueId - 商品のユニークID
+         * @param {number} displayIndex - 表示用の商品番号 (0から始まる)
          * @param {object} [itemData={}] - 初期データ（編集時に使用）
          * @returns {string} 商品入力フォームのHTML文字列
          */
-        function createMultiItemInputHtml(itemIndex, itemData = {}) {
+        function createMultiItemInputHtml(uniqueId, displayIndex, itemData = {}) {
             // 現在のselect要素からオプションを動的に生成
             const categoryOptionsHtml = Array.from(productCategorySelect.options).map(option => `
                 <option value="${option.value}" ${itemData.productCategory === option.value ? 'selected' : ''}>${option.textContent}</option>
@@ -751,9 +753,14 @@
                 <option value="${option.value}" ${itemData.productCondition === option.value ? 'selected' : ''}>${option.textContent}</option>
             `).join('');
 
+            // 画像プレビューの初期URL
+            const initialImageSrc = itemData.imagePreviewUrl || '';
+            const imagePreviewDisplayClass = initialImageSrc ? '' : 'hidden';
+
+
             return `
-                <div class="item-input-block bg-gray-50 p-4 rounded-xl shadow-inner mb-4" data-item-index="${itemIndex}">
-                    <h3 class="text-lg font-bold text-gray-800 mb-3">商品 ${itemIndex + 1}</h3>
+                <div class="item-input-block bg-gray-50 p-4 rounded-xl shadow-inner mb-4" data-item-id="${uniqueId}">
+                    <h3 class="text-lg font-bold text-gray-800 mb-3">商品 ${displayIndex + 1}</h3>
                     <div class="mb-3 text-left">
                         <label class="block text-gray-700 text-sm font-semibold mb-1">商品名 (任意)</label>
                         <input type="text" class="w-full p-2 border border-gray-300 rounded-lg item-input-product-name" placeholder="例: Nikon F3 Body" value="${itemData.productName || ''}">
@@ -799,12 +806,27 @@
                         <label class="block text-gray-700 text-sm font-semibold mb-1">メモ (任意)</label>
                         <textarea class="w-full p-2 border border-gray-300 rounded-lg item-input-memo-text" rows="2">${itemData.memoText || ''}</textarea>
                     </div>
-                    <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm mt-2 delete-item-button">
-                        商品を削除
-                    </button>
-                    <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-xs whitespace-nowrap ml-2 ebay-reference-multi-item-button">
-                        eBay参照
-                    </button>
+
+                    <!-- 画像関連の要素を追加 -->
+                    <div class="mt-4 text-center">
+                        <input type="file" accept="image/*" capture="camera" class="camera-input" id="cameraInput-${uniqueId}">
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 text-sm item-camera-button">
+                            カメラ起動 (撮影メモ)
+                        </button>
+                        <p class="text-gray-500 text-xs mt-1">※撮影した画像をシェアできます。</p>
+                        <div class="image-preview-container ${imagePreviewDisplayClass}">
+                            <img src="${initialImageSrc}" class="max-w-full h-auto rounded-lg shadow-md mx-auto image-preview" alt="撮影画像プレビュー">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between space-x-2 mt-4">
+                        <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md text-sm delete-item-button flex-1">
+                            商品を削除
+                        </button>
+                        <button class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-3 rounded-lg shadow-md text-xs whitespace-nowrap ebay-reference-multi-item-button flex-1">
+                            eBay参照
+                        </button>
+                    </div>
                 </div>
             `;
         }
@@ -813,9 +835,9 @@
          * 新しい商品を追加する
          */
         function addItem() {
-            const newItemIndex = multiItemsData.length; // 現在の配列の長さをインデックスとする
+            const newItemUniqueId = itemUniqueIdCounter++;
             const newItemData = {
-                id: newItemIndex, // ユニークIDとして使用
+                id: newItemUniqueId, // ユニークIDとして使用
                 productCategory: 'none',
                 productName: '',
                 productCondition: 'none',
@@ -826,16 +848,18 @@
                 shippingCostJpy: '',
                 memoText: '',
                 ebayReferenceUrl: '', // 各商品ごとの参照URL
+                imageData: null, // Fileオブジェクトを格納
+                imagePreviewUrl: null, // 画像プレビュー用URL
                 metrics: {} // 計算結果を格納
             };
             multiItemsData.push(newItemData);
 
-            const newItemHtml = createMultiItemInputHtml(newItemIndex);
+            const newItemHtml = createMultiItemInputHtml(newItemUniqueId, multiItemsData.length - 1);
             multiItemInputsContainer.insertAdjacentHTML('beforeend', newItemHtml);
 
             // 新しく追加された要素に対してイベントリスナーを設定
             const newItemElement = multiItemInputsContainer.lastElementChild;
-            attachMultiItemEventListeners(newItemElement, newItemIndex);
+            attachMultiItemEventListeners(newItemElement, newItemUniqueId);
 
             // 全体の計算結果テーブルを更新
             renderMultiItemResultsTable(multiItemResultsTable);
@@ -850,9 +874,8 @@
             const itemBlock = target.closest('.item-input-block');
             if (!itemBlock) return;
 
-            const itemIndex = parseInt(itemBlock.dataset.itemIndex);
-            // multiItemsDataが再インデックスされる可能性があるので、idでアイテムを見つける
-            const item = multiItemsData.find(d => d.id === itemIndex);
+            const itemId = parseInt(itemBlock.dataset.itemId);
+            const item = multiItemsData.find(d => d.id === itemId);
             if (!item) return;
 
             // 入力タイプに応じてitemオブジェクトを更新
@@ -887,9 +910,9 @@
         /**
          * 複数商品入力フォームにイベントリスナーをアタッチする
          * @param {HTMLElement} itemElement - 個別商品フォームのDOM要素
-         * @param {number} index - その商品のインデックス
+         * @param {number} uniqueId - その商品のユニークID
          */
-        function attachMultiItemEventListeners(itemElement, index) {
+        function attachMultiItemEventListeners(itemElement, uniqueId) {
             // 入力フィールドのイベントリスナー（変更を即座に反映）
             itemElement.querySelectorAll('input, select, textarea').forEach(input => {
                 input.addEventListener('input', handleMultiItemInput);
@@ -897,7 +920,7 @@
 
             // 削除ボタン
             itemElement.querySelector('.delete-item-button').addEventListener('click', () => {
-                deleteItem(index);
+                deleteItem(uniqueId);
             });
 
             // レート取得ボタン
@@ -908,9 +931,7 @@
                 
                 // 特定の商品のデータを更新してから計算をトリガーするコールバック
                 const callback = () => {
-                    // findではなく、直接itemElementのデータセットからindexを取得してmultiItemsDataを更新
-                    const currentItemIndex = parseInt(itemElement.dataset.itemIndex);
-                    const item = multiItemsData.find(d => d.id === currentItemIndex); // IDで検索
+                    const item = multiItemsData.find(d => d.id === uniqueId); // IDで検索
                     if (item) {
                         item.exchangeRateJpyUsd = rateInput.value; // 取得したレートをデータに反映
                         item.metrics = calculateItemMetrics(item); // 再計算
@@ -925,8 +946,7 @@
 
             // eBay参照ボタン
             itemElement.querySelector('.ebay-reference-multi-item-button').addEventListener('click', () => {
-                const currentItemIndex = parseInt(itemElement.dataset.itemIndex);
-                const item = multiItemsData.find(d => d.id === currentItemIndex); // IDで検索
+                const item = multiItemsData.find(d => d.id === uniqueId); // IDで検索
                 if (!item) return;
 
                 const productName = item.productName.trim();
@@ -935,17 +955,21 @@
 
                 let searchQueryParts = [];
                 if (productCategory !== 'none' && productCategory.trim() !== '') {
-                    // productCategorySelectから表示テキストを取得
-                    const categoryOption = itemElement.querySelector(`.item-input-product-category option[value="${productCategory}"]`);
-                    if (categoryOption) searchQueryParts.push(categoryOption.textContent);
+                    // productCategorySelectから表示テキストを取得 (マルチ商品モードの選択肢から取得)
+                    const categorySelect = itemElement.querySelector('.item-input-product-category');
+                    if (categorySelect && categorySelect.value !== 'none') {
+                        searchQueryParts.push(categorySelect.options[categorySelect.selectedIndex].textContent);
+                    }
                 }
                 if (productName !== '') {
                     searchQueryParts.push(productName);
                 }
                 if (productCondition !== 'none' && productCondition.trim() !== '') {
-                     // productConditionSelectから表示テキストを取得
-                    const conditionOption = itemElement.querySelector(`.item-input-product-condition option[value="${productCondition}"]`);
-                    if (conditionOption) searchQueryParts.push(conditionOption.textContent);
+                     // productConditionSelectから表示テキストを取得 (マルチ商品モードの選択肢から取得)
+                    const conditionSelect = itemElement.querySelector('.item-input-product-condition');
+                    if (conditionSelect && conditionSelect.value !== 'none') {
+                        searchQueryParts.push(conditionSelect.options[conditionSelect.selectedIndex].textContent);
+                    }
                 }
 
                 const searchQuery = searchQueryParts.join(' ');
@@ -957,26 +981,52 @@
                     item.ebayReferenceUrl = ebaySearchUrl; // 商品ごとに参照URLを保存
                     window.open(ebaySearchUrl, '_blank');
                 } else {
-                    alert('商品名を入力してください。'); // alertは最終的にカスタムモーダルに置き換える
+                    alert('商品名を入力してください。'); // alertはカスタムモーダルに置き換えるべきだが、一時的に使用
+                }
+            });
+
+            // カメラボタン (個別の商品用)
+            const itemCameraButton = itemElement.querySelector('.item-camera-button');
+            const itemCameraInput = itemElement.querySelector('.camera-input');
+            const itemImagePreview = itemElement.querySelector('.image-preview');
+            const itemImagePreviewContainer = itemElement.querySelector('.image-preview-container');
+
+            itemCameraButton.addEventListener('click', () => {
+                itemCameraInput.click();
+            });
+
+            itemCameraInput.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                const item = multiItemsData.find(d => d.id === uniqueId);
+                if (file && item) {
+                    item.imageData = file; // Fileオブジェクトを保存
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        itemImagePreview.src = e.target.result;
+                        item.imagePreviewUrl = e.target.result; // プレビューURLも保存
+                        itemImagePreviewContainer.classList.remove('hidden');
+                    };
+                    reader.readAsDataURL(file);
+                } else if (item) {
+                    item.imageData = null;
+                    item.imagePreviewUrl = null;
+                    itemImagePreview.src = '';
+                    itemImagePreviewContainer.classList.add('hidden');
                 }
             });
         }
 
         /**
          * 商品を削除する
-         * @param {number} idToRemove - 削除する商品の元のインデックス（表示上のID）
+         * @param {number} idToRemove - 削除する商品のユニークID
          */
         function deleteItem(idToRemove) {
             multiItemsData = multiItemsData.filter(item => item.id !== idToRemove); // IDでフィルタリングして削除
-            // 削除後、残ったアイテムのIDと表示インデックスを再構築する
-            multiItemsData.forEach((item, newIndex) => {
-                item.id = newIndex; // IDを新しい表示順に合わせる
-            });
-            itemIndexCounter = multiItemsData.length; // カウンターも更新
-
-            renderMultiItemInputs(); // 入力フォームを再描画
-            renderMultiItemResultsTable(multiItemResultsTable); // 結果テーブルを更新
-            if (!fullscreenTableView.classList.contains('hidden')) { // 全画面表示も更新
+            
+            // 削除後、フォーム要素を再描画し、イベントリスナーを再アタッチ
+            renderMultiItemInputs();
+            renderMultiItemResultsTable(multiItemResultsTable);
+            if (!fullscreenTableView.classList.contains('hidden')) {
                 renderMultiItemResultsTable(fullscreenTableContainer);
             }
         }
@@ -987,10 +1037,9 @@
         function renderMultiItemInputs() {
             multiItemInputsContainer.innerHTML = ''; // 一度クリア
             multiItemsData.forEach((item, index) => {
-                // ここではitem.idが既に更新されていることを前提とする
-                multiItemInputsContainer.insertAdjacentHTML('beforeend', createMultiItemInputHtml(item.id, item));
+                multiItemInputsContainer.insertAdjacentHTML('beforeend', createMultiItemInputHtml(item.id, index, item));
                 const newItemElement = multiItemInputsContainer.lastElementChild;
-                attachMultiItemEventListeners(newItemElement, item.id); // attach時に更新されたIDを渡す
+                attachMultiItemEventListeners(newItemElement, item.id); // attach時にIDを渡す
             });
         }
 
@@ -1010,7 +1059,8 @@
                             <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">為替レート</th>
                             <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">仕入価格(¥)</th>
                             <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">想定利益(¥)</th>
-                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">利益率(%)</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">利益率(%)</th>
+                            <th class="py-2 px-2 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider rounded-tr-lg">メモ</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -1019,7 +1069,7 @@
             if (multiItemsData.length === 0) {
                 tableHtml += `
                     <tr>
-                        <td colspan="7" class="py-4 text-center text-gray-500">商品がありません。'+ 商品を追加'ボタンで追加してください。</td>
+                        <td colspan="8" class="py-4 text-center text-gray-500">商品がありません。'+ 商品を追加'ボタンで追加してください。</td>
                     </tr>
                 `;
             } else {
@@ -1032,6 +1082,7 @@
                     
                     const profitDisplay = metrics.expectedProfitJpy ? metrics.expectedProfitJpy.toLocaleString('ja-JP') : '---';
                     const profitMarginDisplay = metrics.profitMargin ? metrics.profitMargin.toFixed(2) : '---';
+                    const memoDisplay = item.memoText && item.memoText.trim() !== '' ? item.memoText.trim() : '---'; // メモの表示
                     const rowClass = metrics.error ? 'bg-red-50' : ''; // エラーがある行の背景色を変更
 
                     tableHtml += `
@@ -1043,13 +1094,14 @@
                             <td class="py-2 px-2 whitespace-nowrap text-sm text-gray-700">${costPriceDisplay}</td>
                             <td class="py-2 px-2 whitespace-nowrap text-sm text-green-600 font-bold">${profitDisplay}</td>
                             <td class="py-2 px-2 whitespace-nowrap text-sm text-blue-600 font-bold">${profitMarginDisplay} %</td>
+                            <td class="py-2 px-2 text-sm text-gray-700">${memoDisplay}</td>
                         </tr>
                     `;
                     // エラーメッセージがあれば行の下に追加
                     if (metrics.error) {
                          tableHtml += `
                             <tr class="${rowClass}">
-                                <td colspan="7" class="py-1 px-2 text-xs text-red-500 italic">${metrics.error}</td>
+                                <td colspan="8" class="py-1 px-2 text-xs text-red-500 italic">${metrics.error}</td>
                             </tr>
                         `;
                     }
@@ -1080,7 +1132,7 @@
                 const timestamp = `${year}/${month}/${day} ${hours}:${minutes}`;
 
                 // 動的に生成されたフォームから直接テキストコンテンツを取得
-                const itemElement = multiItemInputsContainer.querySelector(`[data-item-index="${item.id}"]`); // IDで要素を検索
+                const itemElement = multiItemInputsContainer.querySelector(`[data-item-id="${item.id}"]`); // IDで要素を検索
                 
                 let categoryText = '---';
                 let conditionText = '---';
@@ -1144,7 +1196,7 @@
                 const metrics = item.metrics || {};
 
                 // カテゴリとコンディションの表示テキストを取得
-                const itemElement = multiItemInputsContainer.querySelector(`[data-item-index="${item.id}"]`);
+                const itemElement = multiItemInputsContainer.querySelector(`[data-item-id="${item.id}"]`); // IDで要素を検索
                 let categoryText = '---';
                 let conditionText = '---';
                 if (itemElement) {
@@ -1168,7 +1220,7 @@
                     item.costPriceJpy || '',
                     item.commissionPercentage || '',
                     item.shippingCostJpy || '',
-                    item.memoText || '',
+                    item.memoText || '', // メモを追加
                     metrics.expectedProfitJpy ? metrics.expectedProfitJpy.toFixed(2) : '',
                     metrics.profitMargin ? metrics.profitMargin.toFixed(2) : '',
                     metrics.breakevenPointUsd ? metrics.breakevenPointUsd.toFixed(2) : '',
@@ -1213,19 +1265,29 @@
         // 全ての計算結果をシェアボタン
         shareAllItemsButton.addEventListener('click', async () => {
             if (navigator.share) {
+                const filesToShare = multiItemsData
+                    .filter(item => item.imageData instanceof File)
+                    .map(item => item.imageData);
+
                 const shareData = {
                     title: '全てのeBay利益計算結果',
                     text: createAllItemsShareMessage(),
                 };
+
+                // ファイルがある場合のみfilesプロパティを追加
+                if (filesToShare.length > 0) {
+                    shareData.files = filesToShare;
+                }
 
                 try {
                     await navigator.share(shareData);
                     console.log('全てのコンテンツが正常に共有されました');
                 } catch (error) {
                     console.error('コンテンツの共有中にエラーが発生しました:', error);
+                    alert('コンテンツの共有に失敗しました。対応するアプリがないか、ファイルサイズが大きすぎる可能性があります。'); // カスタムモーダルに置き換え推奨
                 }
             } else {
-                alert('お使いのブラウザはシェア機能に対応していません。'); // カスタムモーダルに置き換える
+                alert('お使いのブラウザはシェア機能に対応していません。'); // カスタムモーダルに置き換え推奨
             }
         });
 
