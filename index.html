@@ -44,7 +44,9 @@
         }
     </style>
     <!-- スマートフォンショートカットアイコンの指定 -->
+    <!-- Appleデバイス (iOS Safari) のホーム画面アイコン -->
     <link rel="apple-touch-icon" href="S__63234053.jpg">
+    <!-- その他のデバイスやブラウザのファビコン -->
     <link rel="icon" href="S__63234053.jpg">
 </head>
 
@@ -403,8 +405,9 @@
 
         // 為替レートAPIキー
         // ExchangeRate-APIは無料で利用可能ですが、有料プランなどでAPIキーが必要になる場合があります。
-        // APIキーが必要な場合は、https://www.exchangerate-api.com/ で取得して設定してください。
-        const apiKey = ""; 
+        // APIキーが必要な場合は、https://www.exchangerate-api.com/ で取得して、以下の空文字列を置き換えてください。
+        // 例: const apiKey = "YOUR_API_KEY_HERE";
+        const apiKey = "1372dbb55066a8afb68619d3"; 
 
         // --- 関数定義 ---
 
@@ -535,7 +538,7 @@
                     } else if (!response.ok) {
                         specificError = `HTTPエラー: ${response.status} ${response.statusText}`;
                     }
-                    errorMsg.textContent = `レートの取得に失敗しました: ${specificError}。手動で入力してください。`;
+                    errorMsg.textContent = `レートの取得に失敗しました: ${specificError}。APIキーが正しく設定されているかご確認ください。`;
                     errorMsg.classList.remove('hidden');
                 }
             } catch (error) {
@@ -572,8 +575,8 @@
             const listingPrice = itemData.listingPriceUsd.trim() !== '' ? `$${parseFloat(itemData.listingPriceUsd).toFixed(2)}` : '---';
             const rate = itemData.exchangeRateJpyUsd.trim() !== '' ? parseFloat(itemData.exchangeRateJpyUsd).toFixed(2) : '---';
             const cost = itemData.costPriceJpy.trim() !== '' ? parseFloat(itemData.costPriceJpy).toLocaleString('ja-JP') : '---';
-            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(itemData.commissionPercentage).toFixed(1) : '---';
-            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(itemData.shippingCostJpy).toLocaleString('ja-JP') : '---';
+            const commission = itemData.commissionPercentage.trim() !== '' ? parseFloat(item.commissionPercentage).toFixed(1) : '---';
+            const shipping = itemData.shippingCostJpy.trim() !== '' ? parseFloat(item.shippingCostJpy).toLocaleString('ja-JP') : '---';
             
             const memo = itemData.memoText.trim() !== '' ? `\nメモ: ${itemData.memoText.trim()}\n` : '';
             
