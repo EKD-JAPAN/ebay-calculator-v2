@@ -142,7 +142,7 @@
 
             <div class="space-y-4">
                 <div class="bg-blue-50 p-4 rounded-lg border border-blue-100 text-center">
-                    <p class="text-sm text-blue-800 font-medium mb-1">想定利益</p>
+                    <p class="text-sm text-blue-800 font-medium mb-1">想定利益 <span class="text-xs text-blue-600 font-normal">(還付金含まず)</span></p>
                     <p class="text-3xl font-bold text-blue-600" id="resProfit">¥ 0</p>
                 </div>
 
@@ -220,7 +220,7 @@
             </div>
             
             <div class="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-100 flex justify-between items-center">
-                <span class="font-medium text-blue-800">合計想定利益:</span>
+                <span class="font-medium text-blue-800">合計想定利益 (還付金含まず):</span>
                 <span class="font-bold text-xl text-blue-600" id="totalProfitList">¥ 0</span>
             </div>
         </section>
@@ -277,17 +277,17 @@
             // 3. 消費税還付金 (購入金額 × 10/110)
             const taxRefund = Math.floor(purchasePriceJPY * (10 / 110));
             
-            // 4. 想定利益 = 売上 - 手数料 - 送料 - 仕入 + 還付金
-            const profit = salesJPY - feeJPY - shippingJPY - purchasePriceJPY + taxRefund;
+            // 4. 想定利益 = 売上 - 手数料 - 送料 - 仕入 (還付金は含めない)
+            const profit = salesJPY - feeJPY - shippingJPY - purchasePriceJPY;
             
-            // 5. 利益率
+            // 5. 利益率 (還付金を含めない利益で計算)
             const margin = salesJPY > 0 ? ((profit / salesJPY) * 100).toFixed(1) : 0;
             
-            // 6. 損益分岐点($) = (仕入 + 送料 - 還付金) / (レート * (1 - 手数料率))
+            // 6. 損益分岐点($) = (仕入 + 送料) / (レート * (1 - 手数料率)) (還付金は含めない)
             let breakEvenUSD = 0;
             const denominator = exchangeRate * (1 - (feePercent / 100));
             if (denominator > 0) {
-                breakEvenUSD = Math.ceil((purchasePriceJPY + shippingJPY - taxRefund) / denominator);
+                breakEvenUSD = Math.ceil((purchasePriceJPY + shippingJPY) / denominator);
             }
 
             // Update State
@@ -381,7 +381,7 @@
 商品名: ${els.productName.value || '未入力'}
 出品価格: $${els.sellPrice.value || 0}
 仕入価格: ¥${els.purchasePrice.value || 0}
-想定利益: ¥${currentResult.profit.toLocaleString()}
+想定利益(還付金含まず): ¥${currentResult.profit.toLocaleString()}
 利益率: ${currentResult.margin}%
 損益分岐点: $${currentResult.breakEvenUSD.toLocaleString()}
 消費税還付金: ¥${currentResult.taxRefund.toLocaleString()}
