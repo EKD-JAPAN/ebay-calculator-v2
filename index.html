@@ -53,10 +53,15 @@
             </h2>
 
             <div class="space-y-4">
-                <!-- 商品名 -->
+                <!-- 商品名とeBay検索 -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">商品名 (任意)</label>
-                    <input type="text" id="productName" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="例: Nikon F3">
+                    <div class="flex gap-2">
+                        <input type="text" id="productName" class="w-full border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="例: Nikon F3">
+                        <button onclick="searchEbay()" class="bg-gray-800 hover:bg-gray-900 text-white px-4 rounded-lg flex items-center justify-center transition whitespace-nowrap font-medium shadow-sm" title="eBayで相場を調べる">
+                            <i data-lucide="search" class="w-4 h-4 mr-1"></i> eBay
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 金額・レート設定 -->
@@ -307,6 +312,18 @@
             clearImage();
             calculate();
             showToast('フォームをクリアしました');
+        }
+
+        // ---- eBay Search ----
+        function searchEbay() {
+            const query = els.productName.value.trim();
+            if (!query) {
+                showToast('商品名を入力してください');
+                return;
+            }
+            // eBayの検索URLを開く
+            const url = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
         }
 
         // ---- Exchange Rate API ----
