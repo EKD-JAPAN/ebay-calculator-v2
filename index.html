@@ -321,8 +321,8 @@
                 showToast('商品名を入力してください');
                 return;
             }
-            // eBayの検索URLを開く
-            const url = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}`;
+            // eBayの検索URLを開く (販売済み + 価格が高い順)
+            const url = `https://www.ebay.com/sch/i.html?_nkw=${encodeURIComponent(query)}&LH_Sold=1&LH_Complete=1&_sop=16`;
             window.open(url, '_blank');
         }
 
